@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { Sansation } from "next/font/google";
+import { SUSE } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider } from "./providers";
+import { Navbar, PageLayout } from "@/components/layout";
 
-const sansation = Sansation({
-  variable: "--font-sansation",
+const suse = SUSE({
+  variable: "--font-suse",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -21,8 +24,17 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`${sansation.variable} antialiased`}>{children}</body>
+      <html suppressHydrationWarning lang="en">
+        <body className={`${suse.variable} antialiased`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <PageLayout>{children}</PageLayout>
+          </ThemeProvider>
+        </body>
       </html>
     </ClerkProvider>
   );
