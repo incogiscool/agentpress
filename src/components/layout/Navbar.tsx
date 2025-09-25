@@ -14,13 +14,16 @@ export default function Navbar({ className }: NavbarProps) {
         <h1 className="text-2xl font-bold">agentpress</h1>
         <ul className="flex space-x-6">
           {NAVBAR_LINKS.map((link) => (
-            <li className="hover:bg-" key={link.href}>
+            <li className="hover:text-foreground/80 transition" key={link.href}>
               <Link href={link.href}>{link.title}</Link>
             </li>
           ))}
         </ul>
         <div className="flex items-center gap-4">
           <ThemeToggle />
+          <Link className="text-sm text-muted-foreground" href={"/signup"}>
+            Sign up
+          </Link>
           <AuthButton />
         </div>
       </nav>

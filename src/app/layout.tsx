@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { SUSE } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ThemeProvider } from "./providers";
-import { Navbar, PageLayout } from "@/components/layout";
+import { ThemeProvider } from "../providers";
+import { shadcn } from "@clerk/themes";
 
 const suse = SUSE({
   variable: "--font-suse",
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{ theme: shadcn }}>
       <html suppressHydrationWarning lang="en">
         <body className={`${suse.variable} antialiased`}>
           <ThemeProvider
@@ -32,7 +32,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <PageLayout>{children}</PageLayout>
+            {children}
           </ThemeProvider>
         </body>
       </html>

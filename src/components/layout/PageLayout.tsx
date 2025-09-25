@@ -1,7 +1,8 @@
+import { ReactNode } from "react";
 import Navbar from "./Navbar";
 
 interface PageLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function PageLayout({ children }: PageLayoutProps) {

@@ -1,4 +1,5 @@
 import Navbar from "./Navbar";
 import PageLayout from "./PageLayout";
+import AuthPageLayout from "./AuthPageLayout";
 
-export { Navbar, PageLayout };
+export { Navbar, PageLayout, AuthPageLayout };

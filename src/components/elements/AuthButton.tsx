@@ -14,7 +14,7 @@ export default function AuthButton() {
   }
 
   return (
-    <Link href={userId ? "/dashboard" : "/sign-in"}>
+    <Link href={userId ? "/dashboard" : "/signin"}>
       <Button>
         {userId ? (
           <span className="flex items-center gap-2">

@@ -1,7 +1,9 @@
+import { PageLayout } from "@/components/layout";
+
 export default function Home() {
   return (
-    <div>
-      <p>asdasd</p>
-    </div>
+    <PageLayout>
+      <p>asdsd</p>
+    </PageLayout>
   );
 }
