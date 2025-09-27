@@ -15,16 +15,22 @@ export default function Navbar({ className }: NavbarProps) {
         <ul className="flex space-x-6">
           {NAVBAR_LINKS.map((link) => (
             <li className="hover:text-foreground/80 transition" key={link.href}>
-              <Link href={link.href}>{link.title}</Link>
+              {link.disabled ? (
+                <span className="cursor-not-allowed text-muted-foreground">
+                  {link.title}
+                </span>
+              ) : (
+                <Link href={link.href}>{link.title}</Link>
+              )}
             </li>
           ))}
         </ul>
         <div className="flex items-center gap-4">
-          <ThemeToggle />
           <Link className="text-sm text-muted-foreground" href={"/signup"}>
             Sign up
           </Link>
           <AuthButton />
+          <ThemeToggle />
         </div>
       </nav>
       <hr />

@@ -6,6 +6,7 @@ export const NAVBAR_LINKS = [
   {
     title: "Pricing",
     href: "/pricing",
+    disabled: true,
   },
   {
     title: "Contact",
