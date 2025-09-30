@@ -1,6 +1,6 @@
 import { NAVBAR_LINKS } from "@/lib/const/navbar-links";
 import { cn } from "@/lib/utils";
-import { AuthButton, ThemeToggle } from "../elements";
+import { AuthButtons, ThemeToggle } from "../elements";
 import Link from "next/link";
 
 interface NavbarProps {
@@ -28,10 +28,7 @@ export default function Navbar({ className }: NavbarProps) {
           ))}
         </ul>
         <div className="flex items-center gap-4">
-          <Link className="text-sm text-muted-foreground" href={"/signup"}>
-            Sign up
-          </Link>
-          <AuthButton />
+          <AuthButtons />
           <ThemeToggle />
         </div>
       </nav>

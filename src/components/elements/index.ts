@@ -1,4 +1,4 @@
-import AuthButton from "./AuthButton";
+import AuthButtons from "./AuthButton";
 import ThemeToggle from "./ThemeToggle";
 
-export { AuthButton, ThemeToggle };
+export { AuthButtons, ThemeToggle };
