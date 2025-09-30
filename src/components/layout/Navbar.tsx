@@ -11,7 +11,9 @@ export default function Navbar({ className }: NavbarProps) {
   return (
     <div>
       <nav className={cn("flex items-center justify-between p-4", className)}>
-        <h1 className="text-2xl font-bold">agentpress</h1>
+        <Link href={"/"} className="font-bold text-2xl">
+          agentpress
+        </Link>
         <ul className="flex space-x-6">
           {NAVBAR_LINKS.map((link) => (
             <li className="hover:text-foreground/80 transition" key={link.href}>
