@@ -7,7 +7,7 @@ export default function DashboardPage() {
     <PageLayout>
       <Header title="Your Projects" description="Manage your projects here." />
       <div className="grid md:grid-cols-4 grid-cols-1 gap-4 mt-8">
-        {[1, 2, 3, 4].map((item) => (
+        {[1, 2, 3, 4, 5].map((item) => (
           <ProjectCard
             key={item}
             project={{
