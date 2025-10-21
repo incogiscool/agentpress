@@ -1,3 +1,4 @@
+"use client";
 import { MessageSquareCodeIcon } from "lucide-react";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import {
@@ -70,8 +71,7 @@ export const AgentpressChat = () => {
       </CardContent>
 
       <CardFooter className="w-full">
-        {/* <Textarea placeholder="Ask, search, perform anything..." /> */}
-        <ChatInput tools={tools} />
+        <ChatInput onSubmit={console.log} tools={tools} />
       </CardFooter>
     </Card>
   );

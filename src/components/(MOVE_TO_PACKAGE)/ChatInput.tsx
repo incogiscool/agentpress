@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ArrowUp, X, Wrench } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -82,6 +82,8 @@ export function ChatInput({ onSubmit, tools }: ChatInputProps) {
   const [selectedModel, setSelectedModel] = useState<Mode>(modes[0]);
   const [prompt, setPrompt] = useState("");
 
+  const formRef = useRef<HTMLFormElement>(null);
+
   const availableTools = useMemo(() => {
     return tools?.filter((tool) => !selectedTools.includes(tool.id));
   }, [selectedTools, tools]);
@@ -91,11 +93,21 @@ export function ChatInput({ onSubmit, tools }: ChatInputProps) {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (!prompt.trim()) {
+      return;
+    }
+
+    setPrompt("");
+
     onSubmit?.(prompt, selectedTools, selectedModel);
   }
 
   return (
-    <form className="[--radius:1.2rem] w-full" onSubmit={handleSubmit}>
+    <form
+      ref={formRef}
+      className="[--radius:1.2rem] w-full"
+      onSubmit={handleSubmit}
+    >
       <Field>
         <FieldLabel htmlFor="prompt" className="sr-only">
           Prompt
@@ -106,6 +118,12 @@ export function ChatInput({ onSubmit, tools }: ChatInputProps) {
             placeholder="Ask, search, or make anything..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                formRef.current?.requestSubmit();
+              }
+            }}
           />
           <InputGroupAddon align="block-start">
             <Popover open={toolPopoverOpen} onOpenChange={setToolPopoverOpen}>
@@ -248,6 +266,7 @@ export function ChatInput({ onSubmit, tools }: ChatInputProps) {
               className="ml-auto rounded-full"
               variant="default"
               size="icon-sm"
+              type="submit"
             >
               <ArrowUp className="size-4" />
             </InputGroupButton>
