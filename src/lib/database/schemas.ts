@@ -3,6 +3,7 @@ import { Schema } from "mongoose";
 export const MethodSchema = new Schema({
   id: String,
   name: String,
+  user_id: String,
   description: String,
   created_at: Date,
   updated_at: Date,
@@ -15,6 +16,7 @@ export const MethodSchema = new Schema({
 export const ParamSchema = new Schema({
   id: String,
   name: String,
+  user_id: String,
   description: String,
   required: Boolean,
   type: String,
@@ -26,6 +28,7 @@ export const ParamSchema = new Schema({
 export const ProjectSchema = new Schema({
   id: String,
   name: String,
+  user_id: String,
   description: String,
   project_id: String,
   base_url: String,

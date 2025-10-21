@@ -58,6 +58,7 @@ interface ChatInputProps {
     selectedMode: Mode
   ) => void;
   tools?: Tool[];
+  disabled?: boolean;
 }
 
 const modes: Mode[] = [
@@ -75,7 +76,11 @@ const modes: Mode[] = [
   },
 ];
 
-export function ChatInput({ onSubmit, tools }: ChatInputProps) {
+export function ChatInput({
+  onSubmit,
+  tools,
+  disabled = false,
+}: ChatInputProps) {
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [toolPopoverOpen, setToolPopoverOpen] = useState(false);
   const [modelPopoverOpen, setModelPopoverOpen] = useState(false);
@@ -124,6 +129,7 @@ export function ChatInput({ onSubmit, tools }: ChatInputProps) {
                 formRef.current?.requestSubmit();
               }
             }}
+            disabled={disabled}
           />
           <InputGroupAddon align="block-start">
             <Popover open={toolPopoverOpen} onOpenChange={setToolPopoverOpen}>
@@ -137,6 +143,7 @@ export function ChatInput({ onSubmit, tools }: ChatInputProps) {
                       variant="outline"
                       size={!hasSelectedTools ? "sm" : "icon-sm"}
                       className="rounded-full transition-transform"
+                      disabled={disabled}
                     >
                       <Wrench className="size-4" />
                       {!hasSelectedTools && "Select tools"}
@@ -211,7 +218,11 @@ export function ChatInput({ onSubmit, tools }: ChatInputProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <DropdownMenuTrigger asChild>
-                    <InputGroupButton size="sm" className="rounded-full">
+                    <InputGroupButton
+                      size="sm"
+                      className="rounded-full"
+                      disabled={disabled}
+                    >
                       {selectedModel.name}
                     </InputGroupButton>
                   </DropdownMenuTrigger>
@@ -267,6 +278,7 @@ export function ChatInput({ onSubmit, tools }: ChatInputProps) {
               variant="default"
               size="icon-sm"
               type="submit"
+              disabled={disabled}
             >
               <ArrowUp className="size-4" />
             </InputGroupButton>
