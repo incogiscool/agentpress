@@ -1,95 +1,179 @@
-/*
+/**
+ * AgentPress Method Discovery & Upload Script
+ *
+ * This script scans your API routes for exported `methods` arrays,
+ * converts Zod schemas to JSON Schema, and uploads them to the AgentPress database.
+ *
+ * Usage: bun run run.ts
+ */
 
+import fs from "fs";
+import path from "path";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
+// Types
+interface Method {
+  name: string;
+  description: string;
+  method: string;
+  params?: z.ZodType;
+}
 
+interface ProcessedMethod {
+  name: string;
+  description: string;
+  method: string;
+  params?: Record<string, unknown>;
+}
 
-BELOW IS THE CODE USED IN THE PROOF OF CONCEPT, ADJUST INTO PACKAGE
+interface RouteResult {
+  pathname: string;
+  methods: ProcessedMethod[];
+}
 
+// Configuration
+const API_DIR = path.join(__dirname, "src/app/api");
+const API_ENDPOINT =
+  process.env.AGENTPRESS_ENDPOINT || "http://localhost:3000/api/methods";
+const SECRET_KEY = process.env.AGENTPRESS_SECRET_KEY;
 
+// Validate required environment variables
+if (!SECRET_KEY) {
+  console.error(
+    "❌ Error: AGENTPRESS_SECRET_KEY environment variable is required"
+  );
+  process.exit(1);
+}
 
+/**
+ * Recursively finds all route.ts files in the API directory
+ */
+function findRouteFiles(dir: string): string[] {
+  let results: string[] = [];
 
-*/
+  try {
+    const list = fs.readdirSync(dir);
 
-// import fs from "fs";
-// import path from "path";
-// import z from "zod";
+    for (const file of list) {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
 
-// const apiDir = path.join(__dirname, "src/app/api");
+      if (stat && stat.isDirectory()) {
+        // Skip certain directories
+        if (file === "node_modules" || file === ".next") continue;
+        results = results.concat(findRouteFiles(filePath));
+      } else if (file === "route.ts") {
+        results.push(filePath);
+      }
+    }
+  } catch (error) {
+    console.error(`Error reading directory ${dir}:`, error);
+  }
 
-// function findRouteFiles(dir: string): string[] {
-//   let results: string[] = [];
-//   const list = fs.readdirSync(dir);
-//   for (const file of list) {
-//     const filePath = path.join(dir, file);
-//     const stat = fs.statSync(filePath);
-//     if (stat && stat.isDirectory()) {
-//       results = results.concat(findRouteFiles(filePath));
-//     } else if (file === "route.ts") {
-//       results.push(filePath);
-//     }
-//   }
-//   return results;
-// }
+  return results;
+}
 
-// function getMethodsFromJson(routeFilePath: string): string | null {
-//   const dir = path.dirname(routeFilePath);
-//   const jsonPath = path.join(dir, "methods.json");
-//   if (fs.existsSync(jsonPath)) {
-//     const content = fs.readFileSync(jsonPath, "utf8");
-//     try {
-//       return JSON.parse(content);
-//     } catch {
-//       return null;
-//     }
-//   }
-//   return null;
-// }
+/**
+ * Main execution function
+ */
+async function main() {
+  console.log("🔍 Scanning API routes for methods...\n");
 
-// const routeFiles = findRouteFiles(apiDir);
-// // console.log(routeFiles);
-// const results = (
-//   await Promise.all(
-//     routeFiles.map(async (file) => {
-//       const md = await import(file);
-//       if (!md.methods) return null;
-//       const methods = md.methods?.map((method) => {
-//         // console.log(method);
-//         if (method.params) {
-//           return {
-//             ...method,
-//             params: z.toJSONSchema(method?.params),
-//           };
-//         }
+  const routeFiles = findRouteFiles(API_DIR);
+  console.log(`Found ${routeFiles.length} route file(s)\n`);
 
-//         return method;
-//       });
+  const results: RouteResult[] = [];
 
-//       // console.log(methods);
-//       // Get the relative path from apiDir, remove "route.ts", and convert to web path
-//       const relativePath = path.relative(apiDir, file);
-//       const webPath =
-//         "/api/" + relativePath.replace(/\/?route\.ts$/, "").replace(/\\/g, "/");
-//       return {
-//         pathname: webPath === "/" ? "/" : webPath, // root route
-//         methods,
-//       };
-//     })
-//   )
-// ).filter((route) => route !== null);
+  for (const file of routeFiles) {
+    try {
+      const routeModule = await import(file);
 
-// // console.log(results.filter((route) => route !== null));
+      // Skip if no methods exported
+      if (!routeModule.methods || !Array.isArray(routeModule.methods)) {
+        continue;
+      }
 
-// fetch("http://localhost:3000/api/methods", {
-//   method: "POST",
-//   body: JSON.stringify(results),
-//   headers: {
-//     "Content-Type": "application/json",
-//     Authorization: process.env.AGENTPRESS_SECRET_KEY!,
-//   },
-// })
-//   .then((res) => {
-//     console.log("Methods uploaded successfully", res);
-//   })
-//   .catch((err) => {
-//     console.log("Error uploading methods:", err);
-//   });
+      // Process each method
+      const methods: ProcessedMethod[] = routeModule.methods.map(
+        (method: Method) => {
+          const processed: ProcessedMethod = {
+            name: method.name,
+            description: method.description,
+            method: method.method,
+          };
+
+          // Convert Zod schema to JSON Schema if present
+          if (method.params) {
+            try {
+              processed.params = zodToJsonSchema(method.params) as Record<
+                string,
+                unknown
+              >;
+            } catch (error) {
+              console.warn(
+                `⚠️  Warning: Could not convert Zod schema for ${method.name}:`,
+                error
+              );
+            }
+          }
+
+          return processed;
+        }
+      );
+
+      // Get the relative path from API_DIR and convert to web path
+      const relativePath = path.relative(API_DIR, file);
+      const webPath =
+        "/api/" + relativePath.replace(/\/?route\.ts$/, "").replace(/\\/g, "/");
+
+      results.push({
+        pathname: webPath === "/api/" ? "/api" : webPath,
+        methods,
+      });
+
+      console.log(`✓ Found ${methods.length} method(s) in ${webPath}`);
+    } catch (error) {
+      console.error(`❌ Error processing ${file}:`, error);
+    }
+  }
+
+  if (results.length === 0) {
+    console.log("\n⚠️  No methods found to upload");
+    return;
+  }
+
+  console.log(
+    `\n📤 Uploading ${results.length} route(s) to ${API_ENDPOINT}...\n`
+  );
+
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(results),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: SECRET_KEY || "",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log("✅ Methods uploaded successfully!");
+    console.log(result);
+  } catch (error) {
+    console.error("❌ Error uploading methods:");
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+// Run the script
+main().catch((error) => {
+  console.error("❌ Unexpected error:", error);
+  process.exit(1);
+});
