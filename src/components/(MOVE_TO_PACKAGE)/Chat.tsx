@@ -30,43 +30,43 @@ export const AgentpressChat = () => {
     }),
   });
 
-  const tools = [
-    {
-      id: "database",
-      title: "Database Query",
-      description: "Query and manipulate database records",
-    },
-    {
-      id: "email",
-      title: "Send Email",
-      description: "Send emails to users or teams",
-    },
-    {
-      id: "calendar",
-      title: "Calendar",
-      description: "Schedule and manage events",
-    },
-    {
-      id: "documents",
-      title: "Document Generator",
-      description: "Create and edit documents",
-    },
-    {
-      id: "code",
-      title: "Code Executor",
-      description: "Run code snippets and scripts",
-    },
-    {
-      id: "search",
-      title: "Web Search",
-      description: "Search the web for information",
-    },
-    {
-      id: "calculator",
-      title: "Calculator",
-      description: "Perform mathematical calculations",
-    },
-  ];
+  // const tools = [
+  //   {
+  //     id: "database",
+  //     title: "Database Query",
+  //     description: "Query and manipulate database records",
+  //   },
+  //   {
+  //     id: "email",
+  //     title: "Send Email",
+  //     description: "Send emails to users or teams",
+  //   },
+  //   {
+  //     id: "calendar",
+  //     title: "Calendar",
+  //     description: "Schedule and manage events",
+  //   },
+  //   {
+  //     id: "documents",
+  //     title: "Document Generator",
+  //     description: "Create and edit documents",
+  //   },
+  //   {
+  //     id: "code",
+  //     title: "Code Executor",
+  //     description: "Run code snippets and scripts",
+  //   },
+  //   {
+  //     id: "search",
+  //     title: "Web Search",
+  //     description: "Search the web for information",
+  //   },
+  //   {
+  //     id: "calculator",
+  //     title: "Calculator",
+  //     description: "Perform mathematical calculations",
+  //   },
+  // ];
 
   const handleSubmit = (
     prompt: string,
@@ -205,7 +205,7 @@ export const AgentpressChat = () => {
       <CardFooter className="w-full border-t pt-4">
         <ChatInput
           onSubmit={handleSubmit}
-          tools={tools}
+          // tools={tools}
           disabled={status === "streaming" || status === "submitted"}
         />
       </CardFooter>

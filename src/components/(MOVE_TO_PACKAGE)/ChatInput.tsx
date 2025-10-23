@@ -1,17 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { ArrowUp, X, Wrench } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -27,11 +20,11 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+// import {
+//   Popover,
+//   PopoverContent,
+//   PopoverTrigger,
+// } from "@/components/ui/popover";
 import {
   Tooltip,
   TooltipContent,
@@ -94,22 +87,22 @@ const modes: Mode[] = [
 
 export function ChatInput({
   onSubmit,
-  tools,
+  // tools,
   disabled = false,
 }: ChatInputProps) {
-  const [selectedTools, setSelectedTools] = useState<string[]>([]);
-  const [toolPopoverOpen, setToolPopoverOpen] = useState(false);
+  // const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  // const [toolPopoverOpen, setToolPopoverOpen] = useState(false);
   const [modelPopoverOpen, setModelPopoverOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState<Mode>(modes[0]);
   const [prompt, setPrompt] = useState("");
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  const availableTools = useMemo(() => {
-    return tools?.filter((tool) => !selectedTools.includes(tool.id));
-  }, [selectedTools, tools]);
+  // const availableTools = useMemo(() => {
+  //   return tools?.filter((tool) => !selectedTools.includes(tool.id));
+  // }, [selectedTools, tools]);
 
-  const hasSelectedTools = selectedTools.length > 0;
+  // const hasSelectedTools = selectedTools.length > 0;
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -120,7 +113,8 @@ export function ChatInput({
 
     setPrompt("");
 
-    onSubmit?.(prompt, selectedTools, selectedModel);
+    // onSubmit?.(prompt, selectedTools, selectedModel);
+    onSubmit?.(prompt, [], selectedModel);
   }
 
   return (
