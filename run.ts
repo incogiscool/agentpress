@@ -7,12 +7,9 @@
  * Usage: bun run run.ts
  */
 
-// TODO: CHANGE THE IDS TO USE THE NEW OBJECTID() FORMAT
-
 import fs from "fs";
 import path from "path";
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 
 // Types
 interface Method {
@@ -108,7 +105,7 @@ async function main() {
           // Convert Zod schema to JSON Schema if present
           if (method.params) {
             try {
-              processed.params = zodToJsonSchema(method.params) as Record<
+              processed.params = z.toJSONSchema(method.params) as Record<
                 string,
                 unknown
               >;

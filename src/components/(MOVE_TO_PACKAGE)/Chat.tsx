@@ -14,7 +14,15 @@ import {
 import { ChatInput } from "./ChatInput";
 import { ScrollArea } from "../ui/scroll-area";
 
-export const AgentpressChat = () => {
+type AgentpressChatPrompt = {
+  projectId: string;
+  authToken?: string;
+};
+
+export const AgentpressChat = ({
+  projectId,
+  authToken,
+}: AgentpressChatPrompt) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { messages, sendMessage, status } = useChat({
@@ -24,6 +32,8 @@ export const AgentpressChat = () => {
           body: {
             id,
             messages,
+            project_id: projectId,
+            auth_token: authToken,
           },
         };
       },

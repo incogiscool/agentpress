@@ -125,6 +125,13 @@ export default function ProjectCard({ className, project }: ProjectCardProps) {
                 </p>
                 <CopyButton text={project.secret_key || ""} />
               </div>
+              <div className="flex items-center gap-2">
+                <p>
+                  Project ID: {project._id.toString()?.slice(0, 6)}...P
+                  {project._id.toString()?.slice(-4)}
+                </p>
+                <CopyButton text={project._id.toString()} />
+              </div>
             </>
           }
         </CardContent>

@@ -30,15 +30,27 @@ export async function POST(request: NextRequest) {
       const methods = obj.methods;
 
       console.log(obj);
+      console.log({ pathname, methods });
 
       if (methods) {
         for (const method of methods) {
+          // const newMethod = {
+          //   name: method.name,
+          //   description: method.description,
+          //   pathname,
+          //   project_id: project._id.toString(),
+          //   parameters: method.params, // Store params as JSON object
+          //   request_method: method.method,
+          //   user_id: project.user_id, // Associate with the project's user
+          //   created_at: new Date(),
+          //   updated_at: new Date(),
+          // };
           // Create new method document
           const newMethod = await MethodModel.create({
             name: method.name,
             description: method.description,
             pathname,
-            project_id: project.project_id,
+            project_id: project._id.toString(),
             parameters: method.params, // Store params as JSON object
             request_method: method.method,
             user_id: project.user_id, // Associate with the project's user
