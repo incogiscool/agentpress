@@ -7,6 +7,8 @@
  * Usage: bun run run.ts
  */
 
+// TODO: CHANGE THE IDS TO USE THE NEW OBJECTID() FORMAT
+
 import fs from "fs";
 import path from "path";
 import { z } from "zod";
