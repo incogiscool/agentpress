@@ -9,7 +9,9 @@ export async function connectToDatabase() {
   }
 
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI, {
+      dbName: "data",
+    });
     isConnected = true;
   }
 

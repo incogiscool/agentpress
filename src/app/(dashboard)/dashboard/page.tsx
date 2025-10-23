@@ -1,23 +1,33 @@
 import { ProjectCard } from "@/components/features/dashboard";
+import { CreateProjectModal } from "@/components/features/dashboard";
 import { PageLayout } from "@/components/layout";
 import { Header } from "@/components/typography";
+import { getUserProjects } from "@/lib/user/projects";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const projects = await getUserProjects();
+
   return (
     <PageLayout>
-      <Header title="Your Projects" description="Manage your projects here." />
+      <div className="items-center flex justify-between gap-4 flex-wrap">
+        <Header
+          title="Your Projects"
+          description="Manage your projects here."
+        />
+        <CreateProjectModal />
+      </div>
       <div className="grid md:grid-cols-4 grid-cols-1 gap-4 mt-8">
-        {[1, 2, 3, 4, 5].map((item) => (
-          <ProjectCard
-            key={item}
-            project={{
-              id: item.toString(),
-              name: `Project ${item}`,
-              description: `This is project ${item}`,
-              base_url: `https://api.project${item}.com`,
-            }}
-          />
-        ))}
+        {projects.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-muted-foreground">
+              No projects yet. Create your first project to get started!
+            </p>
+          </div>
+        ) : (
+          projects.map((project) => (
+            <ProjectCard key={project._id} project={project} />
+          ))
+        )}
       </div>
     </PageLayout>
   );

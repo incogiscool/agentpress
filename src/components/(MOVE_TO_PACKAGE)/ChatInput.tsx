@@ -76,6 +76,22 @@ const modes: Mode[] = [
   },
 ];
 
+/*
+
+
+
+
+
+
+  TODO: ADD CHAT STOP BUTTON
+
+
+
+
+
+  
+*/
+
 export function ChatInput({
   onSubmit,
   tools,

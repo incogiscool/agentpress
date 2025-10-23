@@ -1,3 +1,4 @@
+import CreateProjectModal from "./CreateProjectModal";
 import ProjectCard from "./ProjectCard";
 
-export { ProjectCard };
+export { ProjectCard, CreateProjectModal };

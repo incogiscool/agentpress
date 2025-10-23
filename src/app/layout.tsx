@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "../providers";
 import { shadcn } from "@clerk/themes";
+import { Toaster } from "@/components/ui/sonner";
 
 const suse = SUSE({
   variable: "--font-suse",
@@ -33,6 +34,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster richColors />
           </ThemeProvider>
         </body>
       </html>
