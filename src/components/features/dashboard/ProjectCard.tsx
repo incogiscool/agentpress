@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Project } from "@/lib/database/types";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Copy, EllipsisVertical } from "lucide-react";
+import { ArrowRight, EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 import { EditProjectModal } from ".";
 import deleteUserProject from "@/lib/user/projects/actions/deleteUserProject";
@@ -35,6 +35,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { CopyButton } from "@/components/elements";
 
 interface ProjectCardProps {
   className?: string;
@@ -118,15 +119,11 @@ export default function ProjectCard({ className, project }: ProjectCardProps) {
             <>
               <p>Base URL: {project.base_url}</p>
               <div className="flex items-center gap-2">
-                <p>Copy Secret Key</p>
-                <Button
-                  variant={"ghost"}
-                  onClick={() =>
-                    navigator.clipboard.writeText(project.secret_key || "")
-                  }
-                >
-                  <Copy />
-                </Button>
+                <p>
+                  Secret Key: {project.secret_key?.slice(0, 6)}...
+                  {project.secret_key?.slice(-4)}
+                </p>
+                <CopyButton text={project.secret_key || ""} />
               </div>
             </>
           }
