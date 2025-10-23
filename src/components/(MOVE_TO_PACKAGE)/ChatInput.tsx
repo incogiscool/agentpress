@@ -131,7 +131,9 @@ export function ChatInput({
             }}
             disabled={disabled}
           />
-          <InputGroupAddon align="block-start">
+
+          {/* FOR NOW, DISABLE TOOLS SELECTION */}
+          {/* <InputGroupAddon align="block-start">
             <Popover open={toolPopoverOpen} onOpenChange={setToolPopoverOpen}>
               <Tooltip>
                 <TooltipTrigger
@@ -208,7 +210,8 @@ export function ChatInput({
                 );
               })}
             </div>
-          </InputGroupAddon>
+          </InputGroupAddon> */}
+
           <InputGroupAddon align="block-end" className="gap-1">
             <DropdownMenu
               open={modelPopoverOpen}
