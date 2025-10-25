@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, UserButton } from "@clerk/clerk-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -35,6 +35,7 @@ export default function AuthButtons() {
           )}
         </Button>
       </Link>
+      <UserButton />
     </div>
   );
 }
