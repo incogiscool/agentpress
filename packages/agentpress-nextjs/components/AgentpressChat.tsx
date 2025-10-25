@@ -1,7 +1,6 @@
 "use client";
 import { MessageSquareCodeIcon, Loader2, X } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
 import { useEffect, useRef, useState } from "react";
 import {
   Card,
@@ -20,6 +19,7 @@ import {
 import { ChatInput } from "./ChatInput";
 import { ScrollArea } from "../ui/scroll-area";
 import { Button } from "../ui/button";
+import { DefaultChatTransport } from "ai";
 
 type AgentpressChatPrompt = {
   projectId: string;
@@ -33,19 +33,28 @@ export const AgentpressChat = ({
   const [isOpen, setIsOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Use a ref to store the latest authToken so the transport always has access to it
+  const authTokenRef = useRef(authToken);
+
+  // Update the ref whenever authToken changes
+  useEffect(() => {
+    authTokenRef.current = authToken;
+  }, [authToken]);
+
   const { messages, sendMessage, status, stop } = useChat({
     transport: new DefaultChatTransport({
-      api: "http://localhost:3000/api/chat",
-      prepareSendMessagesRequest: ({ id, messages }) => {
-        return {
-          body: {
-            id,
-            messages,
-            project_id: projectId,
-            auth_token: authToken,
-          },
-        };
-      },
+      api: "/api/chat",
+      body: () => ({
+        project_id: projectId,
+        /* The reason we are sending the auth_token in a with a ref here is because as of now (25/10/2025), useChat caches the transport
+        and has no way to invalidate - meaning if the token changes, the old token will still be sent to the backend.
+        
+        This is a janky fix but works for now
+
+        From https://github.com/vercel/ai/issues/7819
+        */
+        auth_token: authTokenRef.current,
+      }),
     }),
   });
 

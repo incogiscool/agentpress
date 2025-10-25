@@ -2,7 +2,7 @@
 import { AgentpressChat } from "agentpress-nextjs";
 import { PageLayout } from "@/components/layout";
 import { useAuth } from "@clerk/nextjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [token, setToken] = useState<string | null>(null);
@@ -11,15 +11,16 @@ export default function Home() {
 
   // console.log(token);
 
-  if (auth.userId) {
-    console.log("Fetching token for authenticated user");
-    auth.getToken().then((t) => {
-      // console.log("Received token:", t);
-      setToken(t);
+  useEffect(() => {
+    if (auth.userId) {
+      console.log("Fetching token for authenticated user");
+      auth.getToken().then((t) => {
+        setToken(t);
 
-      console.log(token);
-    });
-  }
+        // console.log("Token fetched:", t);
+      });
+    }
+  }, [auth, auth.userId, auth.getToken]);
 
   return (
     <PageLayout>
