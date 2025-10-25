@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   }: { messages: UIMessage[]; project_id: string; auth_token?: string } =
     await request.json();
 
-  console.log({ project_id, auth_token });
+  // console.log({ project_id, auth_token });
   const methods = await MethodModel.find({
     project_id,
     user_id: user.userId,
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
   const result = streamText({
     model: openai("gpt-4o"),
     system:
-      "You are an AI assistant that helps users by utilizing available tools to provide accurate and efficient responses. Return you responses in plain text format only. Do not use markdown formatting.",
+      "You are an AI assistant that helps users by utilizing available tools to provide accurate and efficient responses. Use the tools when necessary to gather information or perform actions on behalf of the user.",
     messages: convertToModelMessages(messages),
     stopWhen: stepCountIs(10), // stop after 10 steps if tools were called
     // tools: toolsObj,
