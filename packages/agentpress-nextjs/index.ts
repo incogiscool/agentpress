@@ -1,1 +1,1 @@
-console.log("Hello via Bun!");
+export { AgentpressChat } from "./components/AgentpressChat";

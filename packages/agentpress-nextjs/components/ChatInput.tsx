@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "../ui/badge";
 
 import {
   DropdownMenu,
@@ -12,24 +12,20 @@ import {
   DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Field, FieldLabel } from "@/components/ui/field";
+} from "../ui/dropdown-menu";
+import { Field, FieldLabel } from "../ui/field";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupTextarea,
-} from "@/components/ui/input-group";
+} from "../ui/input-group";
 // import {
 //   Popover,
 //   PopoverContent,
 //   PopoverTrigger,
-// } from "@/components/ui/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+// } from "../ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type Mode = {
   name: string;
@@ -93,7 +89,7 @@ export function ChatInput({
   // const [selectedTools, setSelectedTools] = useState<string[]>([]);
   // const [toolPopoverOpen, setToolPopoverOpen] = useState(false);
   const [modelPopoverOpen, setModelPopoverOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<Mode>(modes[0]);
+  const [selectedModel, setSelectedModel] = useState<Mode>(modes[0]!);
   const [prompt, setPrompt] = useState("");
 
   const formRef = useRef<HTMLFormElement>(null);

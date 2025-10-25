@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
+    "agentpress-nextjs": "workspace:*",
     "@ai-sdk/openai": "^2.0.53",
     "@ai-sdk/react": "^2.0.76",
     "@clerk/nextjs": "^6.32.2",
