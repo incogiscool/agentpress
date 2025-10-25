@@ -27,8 +27,17 @@ export async function POST(request: NextRequest) {
     messages,
     project_id,
     auth_token,
-  }: { messages: UIMessage[]; project_id: string; auth_token?: string } =
-    await request.json();
+  }: {
+    messages: UIMessage[];
+    project_id: string;
+    auth_token?:
+      | string
+      | {
+          type: "header" | "query";
+          key: string;
+          value: string;
+        };
+  } = await request.json();
 
   // console.log({ project_id, auth_token });
   const methods = await MethodModel.find({
@@ -59,13 +68,39 @@ export async function POST(request: NextRequest) {
             throw new Error("Project base URL is not defined");
           }
 
+          // Build headers based on auth_token format
+          const headers: Record<string, string> = {
+            "Content-Type": "application/json",
+          };
+
+          // Handle auth_token - can be string or object
+          if (auth_token) {
+            if (typeof auth_token === "string") {
+              // String format - use as Bearer token
+              headers.Authorization = `Bearer ${auth_token}`;
+            } else if (auth_token.type === "header") {
+              // Object format with header type
+              headers[auth_token.key] = auth_token.value;
+            }
+            // Note: query params will be handled in the URL construction
+          }
+
+          // Build URL with query params if needed
+          let url = `${baseUrl}${method.pathname}`;
+          if (
+            auth_token &&
+            typeof auth_token === "object" &&
+            auth_token.type === "query"
+          ) {
+            const params = new URLSearchParams();
+            params.append(auth_token.key, auth_token.value);
+            url += `?${params.toString()}`;
+          }
+
           // Call the external API endpoint
-          const response = await fetch(`${baseUrl}${method.pathname}`, {
+          const response = await fetch(url, {
             method: method.request_method || "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${auth_token || ""}`,
-            },
+            headers,
             body:
               method.request_method === "GET"
                 ? undefined

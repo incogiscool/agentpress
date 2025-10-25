@@ -23,9 +23,21 @@ import { DefaultChatTransport } from "ai";
 
 type AgentpressChatPrompt = {
   projectId: string;
-  authToken?: string;
+  authToken?:
+    | string
+    | {
+        type: "header" | "query";
+        key: string;
+        value: string;
+      };
 };
 
+/**
+ * @param projectId - The ID of the project to associate the chat with.
+ * @param authToken - The auth token that will be sent to your API routes from the user (for protected features). Can be:
+ *   - a raw token string (passed to the api as Authorization: "Bearer <token>")
+ *   - an object describing transport: { type: "header" | "query", key: string, value: string }. Adjust this to the format your routes expect.
+ */
 export const AgentpressChat = ({
   projectId,
   authToken,
@@ -49,7 +61,7 @@ export const AgentpressChat = ({
         /* The reason we are sending the auth_token in a with a ref here is because as of now (25/10/2025), useChat caches the transport
         and has no way to invalidate - meaning if the token changes, the old token will still be sent to the backend.
         
-        This is a janky fix but works for now
+        This is a very janky fix but works for now
 
         From https://github.com/vercel/ai/issues/7819
         */
