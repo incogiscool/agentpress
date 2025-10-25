@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Square } from "lucide-react";
 
 import { Badge } from "../ui/badge";
 
@@ -20,11 +20,6 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from "../ui/input-group";
-// import {
-//   Popover,
-//   PopoverContent,
-//   PopoverTrigger,
-// } from "../ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type Mode = {
@@ -33,21 +28,15 @@ type Mode = {
   disabled?: boolean;
   disabledReason?: string;
 };
-
-type Tool = {
-  title: string;
-  id: string;
-  description: string;
-};
-
 interface ChatInputProps {
   onSubmit?: (
     prompt: string,
     selectedTools: string[],
     selectedMode: Mode
   ) => void;
-  tools?: Tool[];
+  onStop?: () => void;
   disabled?: boolean;
+  isStreaming?: boolean;
 }
 
 const modes: Mode[] = [
@@ -56,13 +45,13 @@ const modes: Mode[] = [
   // },
   {
     name: "Agent Mode",
-    badge: "Beta",
+    // badge: "Beta",
   },
-  {
-    name: "Plan Mode",
-    disabled: true,
-    // disabledReason: "Coming Soon",
-  },
+  //   {
+  //     name: "Plan Mode",
+  //     disabled: true,
+  //     disabledReason: "Coming Soon",
+  //   },
 ];
 
 /*
@@ -83,22 +72,15 @@ const modes: Mode[] = [
 
 export function ChatInput({
   onSubmit,
-  // tools,
+  onStop,
   disabled = false,
+  isStreaming = false,
 }: ChatInputProps) {
-  // const [selectedTools, setSelectedTools] = useState<string[]>([]);
-  // const [toolPopoverOpen, setToolPopoverOpen] = useState(false);
   const [modelPopoverOpen, setModelPopoverOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState<Mode>(modes[0]!);
   const [prompt, setPrompt] = useState("");
 
   const formRef = useRef<HTMLFormElement>(null);
-
-  // const availableTools = useMemo(() => {
-  //   return tools?.filter((tool) => !selectedTools.includes(tool.id));
-  // }, [selectedTools, tools]);
-
-  // const hasSelectedTools = selectedTools.length > 0;
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -109,7 +91,6 @@ export function ChatInput({
 
     setPrompt("");
 
-    // onSubmit?.(prompt, selectedTools, selectedModel);
     onSubmit?.(prompt, [], selectedModel);
   }
 
@@ -137,86 +118,6 @@ export function ChatInput({
             }}
             disabled={disabled}
           />
-
-          {/* FOR NOW, DISABLE TOOLS SELECTION */}
-          {/* <InputGroupAddon align="block-start">
-            <Popover open={toolPopoverOpen} onOpenChange={setToolPopoverOpen}>
-              <Tooltip>
-                <TooltipTrigger
-                  asChild
-                  onFocusCapture={(e) => e.stopPropagation()}
-                >
-                  <PopoverTrigger asChild>
-                    <InputGroupButton
-                      variant="outline"
-                      size={!hasSelectedTools ? "sm" : "icon-sm"}
-                      className="rounded-full transition-transform"
-                      disabled={disabled}
-                    >
-                      <Wrench className="size-4" />
-                      {!hasSelectedTools && "Select tools"}
-                    </InputGroupButton>
-                  </PopoverTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Select tools for the agent to use
-                </TooltipContent>
-              </Tooltip>
-              <PopoverContent className="p-0 [--radius:1.2rem]" align="start">
-                <Command>
-                  <CommandInput placeholder="Search tools..." />
-                  <CommandList>
-                    <CommandEmpty>No tools found</CommandEmpty>
-                    <CommandGroup heading="Available Tools">
-                      {availableTools?.map((tool) => (
-                        <CommandItem
-                          key={tool.id}
-                          value={tool.id}
-                          onSelect={() => {
-                            setSelectedTools((prev) => [...prev, tool.id]);
-                            setToolPopoverOpen(false);
-                          }}
-                        >
-                          <div className="flex flex-col">
-                            <span className="font-medium">{tool.title}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {tool.description}
-                            </span>
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            <div className="no-scrollbar -m-1.5 flex gap-1 overflow-y-auto p-1.5">
-              {selectedTools.map((toolId) => {
-                const tool = tools?.find((t) => t.id === toolId);
-
-                if (!tool) {
-                  return null;
-                }
-
-                return (
-                  <InputGroupButton
-                    key={toolId}
-                    size="sm"
-                    variant="secondary"
-                    className="rounded-full !pl-2"
-                    onClick={() => {
-                      setSelectedTools((prev) =>
-                        prev.filter((id) => id !== toolId)
-                      );
-                    }}
-                  >
-                    {tool.title}
-                    <X className="size-3" />
-                  </InputGroupButton>
-                );
-              })}
-            </div>
-          </InputGroupAddon> */}
 
           <InputGroupAddon align="block-end" className="gap-1">
             <DropdownMenu
@@ -281,16 +182,34 @@ export function ChatInput({
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-            <InputGroupButton
-              aria-label="Send"
-              className="ml-auto rounded-full"
-              variant="default"
-              size="icon-sm"
-              type="submit"
-              disabled={disabled}
-            >
-              <ArrowUp className="size-4" />
-            </InputGroupButton>
+            {isStreaming ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InputGroupButton
+                    aria-label="Stop"
+                    className="ml-auto rounded-full"
+                    variant="outline"
+                    size="icon-sm"
+                    type="button"
+                    onClick={onStop}
+                  >
+                    <Square className="size-4" />
+                  </InputGroupButton>
+                </TooltipTrigger>
+                <TooltipContent>Stop generating</TooltipContent>
+              </Tooltip>
+            ) : (
+              <InputGroupButton
+                aria-label="Send"
+                className="ml-auto rounded-full"
+                variant="default"
+                size="icon-sm"
+                type="submit"
+                disabled={disabled}
+              >
+                <ArrowUp className="size-4" />
+              </InputGroupButton>
+            )}
           </InputGroupAddon>
         </InputGroup>
       </Field>
