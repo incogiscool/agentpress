@@ -5,4 +5,5 @@ export type Method = {
   name: string;
   description: string;
   params?: ZodObject;
+  paramsType?: "query" | "body";
 };

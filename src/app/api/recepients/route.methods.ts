@@ -7,5 +7,6 @@ export const methods: Method[] = [
     name: "getRecipientId",
     description: "Get a recipient's id by their name",
     params: recipientSchema,
+    paramsType: "query",
   },
 ];

@@ -11,6 +11,7 @@ export const MethodSchema = new Schema(
     project_id: String,
     parameters: Object,
     request_method: String,
+    params_type: String,
   },
   { _id: true }
 );

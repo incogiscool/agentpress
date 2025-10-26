@@ -28,7 +28,9 @@ export default function Home() {
         <AgentpressChat
           projectId="68fa90f160a0801894e6231c"
           authToken={token}
-          apiEndpoint="http://localhost:3000/api/chat"
+          apiEndpoint={
+            process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL + "/chat"
+          }
         />
       )}
     </PageLayout>

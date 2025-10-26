@@ -17,6 +17,7 @@ interface Method {
   description: string;
   method: string;
   params?: z.ZodType;
+  paramsType?: "body" | "query";
 }
 
 interface ProcessedMethod {
@@ -24,6 +25,7 @@ interface ProcessedMethod {
   description: string;
   method: string;
   params?: Record<string, unknown>;
+  paramsType: "body" | "query";
 }
 
 interface RouteResult {
@@ -33,7 +35,9 @@ interface RouteResult {
 
 // Configuration
 const API_DIR = path.join(__dirname, "src/app/api");
-const API_ENDPOINT = "http://localhost:3000/api/methods";
+const API_ENDPOINT =
+  process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL + "/methods" ||
+  "https://agentpress.netlify.app/api/methods";
 const SECRET_KEY = process.env.AGENTPRESS_SECRET_KEY;
 
 // Validate required environment variables
@@ -99,6 +103,7 @@ async function main() {
             name: method.name,
             description: method.description,
             method: method.method,
+            paramsType: method.paramsType || "body", // Default to "body"
           };
 
           // Convert Zod schema to JSON Schema if present

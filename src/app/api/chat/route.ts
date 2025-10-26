@@ -116,24 +116,46 @@ export async function POST(request: NextRequest) {
 
           // Build URL with query params if needed
           let url = `${baseUrl}${method.pathname}`;
+
+          // Handle query params based on paramsType
+          const urlParams = new URLSearchParams();
+
+          // Add auth token if it's a query type
           if (
             auth_token &&
             typeof auth_token === "object" &&
             auth_token.type === "query"
           ) {
-            const params = new URLSearchParams();
-            params.append(auth_token.key, auth_token.value);
-            url += `?${params.toString()}`;
+            urlParams.append(auth_token.key, auth_token.value);
           }
+
+          // Add method parameters if paramsType is "query"
+          if (
+            method.params_type === "query" &&
+            input &&
+            typeof input === "object"
+          ) {
+            Object.entries(input).forEach(([key, value]) => {
+              if (value !== undefined && value !== null) {
+                urlParams.append(key, String(value));
+              }
+            });
+          }
+
+          // Append query params to URL if any exist
+          if (urlParams.toString()) {
+            url += `?${urlParams.toString()}`;
+          }
+
+          // Determine body based on paramsType
+          const shouldSendBody =
+            method.request_method !== "GET" && method.params_type !== "query";
 
           // Call the external API endpoint
           const response = await fetch(url, {
             method: method.request_method || "POST",
             headers,
-            body:
-              method.request_method === "GET"
-                ? undefined
-                : JSON.stringify(input),
+            body: shouldSendBody ? JSON.stringify(input) : undefined,
           });
 
           if (!response.ok) {

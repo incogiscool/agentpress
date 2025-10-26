@@ -10,7 +10,9 @@ export const GET = async (req: NextRequest) => {
   };
 
   if (userId) {
-    const { name } = await req.json();
+    // Get name from query parameters
+    const { searchParams } = new URL(req.url);
+    const name = searchParams.get("name");
 
     if (name && typeof name === "string") {
       //@ts-expect-error any

@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
               $set: {
                 description: method.description,
                 parameters: method.params, // Store params as JSON object
+                params_type: method.paramsType || "body", // Store params type, default to "body"
                 request_method: method.method,
                 updated_at: new Date(),
               },
