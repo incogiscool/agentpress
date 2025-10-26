@@ -33,8 +33,7 @@ interface RouteResult {
 
 // Configuration
 const API_DIR = path.join(__dirname, "src/app/api");
-const API_ENDPOINT =
-  process.env.AGENTPRESS_ENDPOINT || "http://localhost:3000/api/methods";
+const API_ENDPOINT = "http://localhost:3000/api/methods";
 const SECRET_KEY = process.env.AGENTPRESS_SECRET_KEY;
 
 // Validate required environment variables
@@ -46,7 +45,7 @@ if (!SECRET_KEY) {
 }
 
 /**
- * Recursively finds all route.ts files in the API directory
+ * Recursively finds all route.methods.ts files in the API directory
  */
 function findRouteFiles(dir: string): string[] {
   let results: string[] = [];
@@ -62,7 +61,7 @@ function findRouteFiles(dir: string): string[] {
         // Skip certain directories
         if (file === "node_modules" || file === ".next") continue;
         results = results.concat(findRouteFiles(filePath));
-      } else if (file === "route.ts") {
+      } else if (file === "route.methods.ts") {
         results.push(filePath);
       }
     }
@@ -124,7 +123,8 @@ async function main() {
       // Get the relative path from API_DIR and convert to web path
       const relativePath = path.relative(API_DIR, file);
       const webPath =
-        "/api/" + relativePath.replace(/\/?route\.ts$/, "").replace(/\\/g, "/");
+        "/api/" +
+        relativePath.replace(/\/?route\.methods\.ts$/, "").replace(/\\/g, "/");
 
       results.push({
         pathname: webPath === "/api/" ? "/api" : webPath,

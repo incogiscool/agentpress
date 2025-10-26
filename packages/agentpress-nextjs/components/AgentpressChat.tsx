@@ -30,6 +30,7 @@ type AgentpressChatPrompt = {
         key: string;
         value: string;
       };
+  apiEndpoint?: string;
 };
 
 /**
@@ -37,10 +38,12 @@ type AgentpressChatPrompt = {
  * @param authToken - The auth token that will be sent to your API routes from the user (for protected features). Can be:
  *   - a raw token string (passed to the api as Authorization: "Bearer <token>")
  *   - an object describing transport: { type: "header" | "query", key: string, value: string }. Adjust this to the format your routes expect.
+ * @param apiEndpoint - Optional custom API endpoint.
  */
 export const AgentpressChat = ({
   projectId,
   authToken,
+  apiEndpoint = "https://agentpress.netlify.app/api/chat",
 }: AgentpressChatPrompt) => {
   const [isOpen, setIsOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -55,7 +58,7 @@ export const AgentpressChat = ({
 
   const { messages, sendMessage, status, stop } = useChat({
     transport: new DefaultChatTransport({
-      api: "/api/chat",
+      api: apiEndpoint,
       body: () => ({
         project_id: projectId,
         /* The reason we are sending the auth_token in a with a ref here is because as of now (25/10/2025), useChat caches the transport

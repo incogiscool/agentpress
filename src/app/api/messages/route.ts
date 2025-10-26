@@ -1,27 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import z from "zod";
 import twilio from "twilio";
-
-const sendMessageSchema = z.object({
-  recipientId: z.string(),
-  content: z.string().min(1).max(1000),
-});
-
-export const methods = [
-  {
-    method: "GET",
-    name: "getMessages",
-    description: "Get all the message chains I have with other users.",
-    params: undefined,
-  },
-  {
-    method: "POST",
-    name: "sendMessage",
-    description: "Send a message to another user.",
-    params: sendMessageSchema,
-  },
-];
+import { sendMessageSchema } from "@/lib/schemas";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID!;
 const authToken = process.env.TWILIO_AUTH_TOKEN!;

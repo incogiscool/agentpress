@@ -1,19 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import z from "zod";
-
-const schema = z.object({
-  name: z.string().min(2).max(100),
-});
-
-export const methods = [
-  {
-    method: "GET",
-    name: "getRecipientId",
-    description: "Get a recipient's id by their name",
-    params: schema,
-  },
-];
 
 export const GET = async (req: NextRequest) => {
   const { userId } = await auth();
