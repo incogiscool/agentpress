@@ -16,7 +16,7 @@ export default async function DashboardPage() {
         />
         <CreateProjectModal />
       </div>
-      <div className="grid md:grid-cols-4 grid-cols-1 gap-4 mt-8">
+      <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mt-8">
         {projects.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <p className="text-muted-foreground">

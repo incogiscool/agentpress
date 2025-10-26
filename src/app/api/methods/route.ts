@@ -34,31 +34,36 @@ export async function POST(request: NextRequest) {
 
       if (methods) {
         for (const method of methods) {
-          // const newMethod = {
-          //   name: method.name,
-          //   description: method.description,
-          //   pathname,
-          //   project_id: project._id.toString(),
-          //   parameters: method.params, // Store params as JSON object
-          //   request_method: method.method,
-          //   user_id: project.user_id, // Associate with the project's user
-          //   created_at: new Date(),
-          //   updated_at: new Date(),
-          // };
-          // Create new method document
-          const newMethod = await MethodModel.create({
-            name: method.name,
-            description: method.description,
-            pathname,
-            project_id: project._id.toString(),
-            parameters: method.params, // Store params as JSON object
-            request_method: method.method,
-            user_id: project.user_id, // Associate with the project's user
-            created_at: new Date(),
-            updated_at: new Date(),
-          });
+          // Use updateOne with upsert to either update existing or create new
+          const result = await MethodModel.updateOne(
+            {
+              // Find by unique combination of pathname, name, and project_id
+              pathname,
+              name: method.name,
+              project_id: project._id.toString(),
+              user_id: project.user_id,
+            },
+            {
+              $set: {
+                description: method.description,
+                parameters: method.params, // Store params as JSON object
+                request_method: method.method,
+                updated_at: new Date(),
+              },
+              $setOnInsert: {
+                created_at: new Date(),
+              },
+            },
+            {
+              upsert: true, // Create if doesn't exist, update if exists
+            }
+          );
 
-          console.log("inserted method ", newMethod);
+          console.log(
+            result.upsertedCount > 0
+              ? `✓ Created method: ${method.name}`
+              : `✓ Updated method: ${method.name}`
+          );
         }
       }
     }

@@ -136,7 +136,7 @@ export default function ProjectCard({ className, project }: ProjectCardProps) {
           }
         </CardContent>
         <CardFooter className="flex items-center gap-2 text-muted-foreground/30">
-          <p>Go to project</p>
+          <p>See methods</p>
           <ArrowRight />
         </CardFooter>
       </Card>
