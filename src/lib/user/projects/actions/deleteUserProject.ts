@@ -1,6 +1,6 @@
 "use server";
 import { connectToDatabase } from "@/lib/database/database";
-import { ProjectModel } from "@/lib/database/models";
+import { MethodModel, ProjectModel } from "@/lib/database/models";
 import { auth } from "@clerk/nextjs/server";
 
 /**
@@ -32,5 +32,9 @@ export default async function deleteUserProject(
   await ProjectModel.deleteOne({
     _id: projectId,
     user_id: user.userId,
+  });
+
+  await MethodModel.deleteMany({
+    project_id: projectId,
   });
 }
