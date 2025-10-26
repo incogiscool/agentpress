@@ -29,7 +29,9 @@ export default function Home() {
           projectId="68fa90f160a0801894e6231c"
           authToken={token}
           apiEndpoint={
-            process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL + "/chat"
+            process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL
+              ? process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL + "/chat"
+              : undefined
           }
         />
       )}
