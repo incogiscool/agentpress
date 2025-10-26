@@ -50,11 +50,11 @@ function Button({
   const Comp = asChild ? Slot : "button";
 
   return (
-    // @ts-expect-error - Radix Slot type incompatibility with React 19 popover attribute
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      {...(props as any)}
     >
       {isLoading && <Spinner />}
       {props.children}

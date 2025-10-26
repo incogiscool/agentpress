@@ -35,11 +35,11 @@ function Badge({
   const Comp = asChild ? Slot : "span";
 
   return (
-    // @ts-expect-error - Radix Slot type incompatibility with React 19 popover attribute
     <Comp
       data-slot="badge"
       className={cn(badgeVariants({ variant }), className)}
-      {...props}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      {...(props as any)}
     />
   );
 }
