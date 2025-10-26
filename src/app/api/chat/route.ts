@@ -10,18 +10,12 @@ import {
   Tool,
 } from "ai";
 import { MethodModel, ProjectModel } from "@/lib/database/models";
-import { auth } from "@clerk/nextjs/server";
 import { connectToDatabase } from "@/lib/database/database";
+import { Method, Project } from "@/lib/database/types";
 
 export async function POST(request: NextRequest) {
   // Connect to database first
   await connectToDatabase();
-
-  const user = await auth();
-
-  if (!user) {
-    throw new Error("Unauthorized");
-  }
 
   const {
     messages,
@@ -39,17 +33,52 @@ export async function POST(request: NextRequest) {
         };
   } = await request.json();
 
-  // console.log({ project_id, auth_token });
-  const methods = await MethodModel.find({
-    project_id,
-    user_id: user.userId,
-  });
-  const project = await ProjectModel.findOne({
+  // Validate that the request is coming from an accepted origin
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
+
+  const project = await ProjectModel.findOne<Project>({
     _id: project_id,
-    user_id: user.userId,
   });
 
-  const baseUrl = project?.base_url;
+  if (!project) {
+    throw new Error("Project not found");
+  }
+
+  const baseUrl = project.base_url;
+
+  // Validate request origin matches the project's base URL
+  if (baseUrl) {
+    try {
+      const projectUrl = new URL(baseUrl);
+      const projectOrigin = `${projectUrl.protocol}//${projectUrl.host}`;
+
+      // Check if request origin or referer matches the project's base URL
+      const isValidOrigin = origin === projectOrigin;
+      const isValidReferer = referer?.startsWith(projectOrigin);
+
+      if (!isValidOrigin && !isValidReferer) {
+        throw new Error(
+          `Request rejected: Origin must be from ${projectOrigin}`
+        );
+      }
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.startsWith("Request rejected")
+      ) {
+        throw error;
+      }
+      // If URL parsing fails, log but continue (for backwards compatibility)
+      console.warn("Failed to parse base URL for origin validation:", error);
+    }
+  }
+
+  // console.log({ project_id, auth_token });
+  const methods = await MethodModel.find<Method>({
+    project_id,
+    user_id: project.user_id,
+  });
 
   const toolsObj: Record<string, Tool> = {};
 
