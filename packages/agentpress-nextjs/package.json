@@ -1,14 +1,47 @@
 {
   "name": "agentpress-nextjs",
   "version": "0.1.0",
+  "description": "React component library for building AI-powered chat interfaces with Next.js and AgentPress",
+  "author": "incogiscool",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/incogiscool/agentpress.git",
+    "directory": "packages/agentpress-nextjs"
+  },
+  "keywords": [
+    "agentpress",
+    "ai",
+    "chat",
+    "nextjs",
+    "react",
+    "ai-sdk",
+    "vercel-ai"
+  ],
   "main": "./index.ts",
   "types": "./index.ts",
   "module": "index.ts",
   "type": "module",
+  "bin": {
+    "agentpress-sync": "./bin/cli.ts"
+  },
   "exports": {
     ".": "./index.ts",
     "./components/*": "./components/*.tsx",
-    "./ui/*": "./ui/*.tsx"
+    "./ui/*": "./ui/*.tsx",
+    "./lib/*": "./lib/*.ts"
+  },
+  "files": [
+    "bin",
+    "components",
+    "ui",
+    "lib",
+    "index.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "prepublishOnly": "bun test",
+    "build": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/bun": "latest",
