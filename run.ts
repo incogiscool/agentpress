@@ -1,12 +1,3 @@
-/**
- * AgentPress Method Discovery & Upload Script
- *
- * This script scans your API routes for exported `methods` arrays,
- * converts Zod schemas to JSON Schema, and uploads them to the AgentPress database.
- *
- * Usage: bun run run.ts
- */
-
 import fs from "fs";
 import path from "path";
 import { z } from "zod";
@@ -35,9 +26,9 @@ interface RouteResult {
 
 // Configuration
 const API_DIR = path.join(__dirname, "src/app/api");
-const API_ENDPOINT =
-  process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL + "/methods" ||
-  "https://agentpress.netlify.app/api/methods";
+const API_ENDPOINT = process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL
+  ? process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL + "/methods"
+  : "https://agentpress.netlify.app/api/methods";
 const SECRET_KEY = process.env.AGENTPRESS_SECRET_KEY;
 
 // Validate required environment variables
