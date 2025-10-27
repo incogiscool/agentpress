@@ -36,7 +36,28 @@ interface RouteResult {
 
 // Configuration - Look for API directory in the current working directory (where command is run)
 const CWD = process.cwd();
-const API_DIR = path.join(CWD, "src/app/api");
+
+// Try both routing patterns: src/app/api (with src) and app/api (without src)
+const API_DIR_WITH_SRC = path.join(CWD, "src/app/api");
+const API_DIR_WITHOUT_SRC = path.join(CWD, "app/api");
+
+// Determine which pattern exists
+let API_DIR: string;
+if (fs.existsSync(API_DIR_WITH_SRC)) {
+  API_DIR = API_DIR_WITH_SRC;
+} else if (fs.existsSync(API_DIR_WITHOUT_SRC)) {
+  API_DIR = API_DIR_WITHOUT_SRC;
+} else {
+  console.error(
+    "❌ Error: API directory not found.\nLooked in:\n  - " +
+      API_DIR_WITH_SRC +
+      "\n  - " +
+      API_DIR_WITHOUT_SRC +
+      "\n\nMake sure you're running this command from your Next.js project root."
+  );
+  process.exit(1);
+}
+
 const API_ENDPOINT = process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL
   ? process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL + "/api/methods"
   : "https://agentpress.netlify.app/api/methods";
@@ -82,15 +103,8 @@ function findRouteFiles(dir: string): string[] {
  * Main execution function
  */
 async function main() {
-  console.log("🔍 Scanning API routes for methods...\n");
-
-  // Check if API directory exists
-  if (!fs.existsSync(API_DIR)) {
-    console.error(
-      `❌ Error: API directory not found at ${API_DIR}\nMake sure you're running this command from your Next.js project root.`
-    );
-    process.exit(1);
-  }
+  console.log("🔍 Scanning API routes for methods...");
+  console.log(`📁 Using API directory: ${API_DIR}\n`);
 
   const routeFiles = findRouteFiles(API_DIR);
   console.log(`Found ${routeFiles.length} route file(s)\n`);
