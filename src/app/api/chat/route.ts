@@ -42,10 +42,16 @@ export async function POST(request: NextRequest) {
   });
 
   if (!project) {
-    throw new Error("Project not found");
+    return new Response(JSON.stringify({ error: "Project not found" }), {
+      status: 404,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 
   const baseUrl = project.base_url;
+  let allowedOrigin = origin || "";
 
   // Validate request origin matches the project's base URL
   if (baseUrl) {
@@ -58,23 +64,36 @@ export async function POST(request: NextRequest) {
       const isValidReferer = referer?.startsWith(projectOrigin);
 
       if (!isValidOrigin && !isValidReferer) {
-        throw new Error(
-          `Request rejected: Origin must be from ${projectOrigin}`
+        return new Response(
+          JSON.stringify({
+            error: `Request rejected: Origin must be from ${projectOrigin}`,
+          }),
+          {
+            status: 403,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
       }
+
+      allowedOrigin = projectOrigin;
     } catch (error) {
       if (
         error instanceof Error &&
         error.message.startsWith("Request rejected")
       ) {
-        throw error;
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 403,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
       }
-      // If URL parsing fails, log but continue (for backwards compatibility)
       console.warn("Failed to parse base URL for origin validation:", error);
     }
   }
 
-  // console.log({ project_id, auth_token });
   const methods = await MethodModel.find<Method>({
     project_id,
     user_id: project.user_id,
@@ -89,38 +108,25 @@ export async function POST(request: NextRequest) {
         description: method.description || "No description provided",
         inputSchema: jsonSchema(method.parameters || {}),
         execute: async (input: unknown) => {
-          // console.log(`Executing tool: ${method.name}`, input);
-
-          // console.log(baseUrl + method.pathname);
-
           if (!baseUrl) {
             throw new Error("Project base URL is not defined");
           }
 
-          // Build headers based on auth_token format
           const headers: Record<string, string> = {
             "Content-Type": "application/json",
           };
 
-          // Handle auth_token - can be string or object
           if (auth_token) {
             if (typeof auth_token === "string") {
-              // String format - use as Bearer token
               headers.Authorization = `Bearer ${auth_token}`;
             } else if (auth_token.type === "header") {
-              // Object format with header type
               headers[auth_token.key] = auth_token.value;
             }
-            // Note: query params will be handled in the URL construction
           }
 
-          // Build URL with query params if needed
           let url = `${baseUrl}${method.pathname}`;
-
-          // Handle query params based on paramsType
           const urlParams = new URLSearchParams();
 
-          // Add auth token if it's a query type
           if (
             auth_token &&
             typeof auth_token === "object" &&
@@ -129,7 +135,6 @@ export async function POST(request: NextRequest) {
             urlParams.append(auth_token.key, auth_token.value);
           }
 
-          // Add method parameters if paramsType is "query"
           if (
             method.params_type === "query" &&
             input &&
@@ -142,16 +147,13 @@ export async function POST(request: NextRequest) {
             });
           }
 
-          // Append query params to URL if any exist
           if (urlParams.toString()) {
             url += `?${urlParams.toString()}`;
           }
 
-          // Determine body based on paramsType
           const shouldSendBody =
             method.request_method !== "GET" && method.params_type !== "query";
 
-          // Call the external API endpoint
           const response = await fetch(url, {
             method: method.request_method || "POST",
             headers,
@@ -176,12 +178,37 @@ export async function POST(request: NextRequest) {
     system:
       "You are an AI assistant that helps users by utilizing available tools to provide accurate and efficient responses. Use the tools when necessary to gather information or perform actions on behalf of the user.",
     messages: convertToModelMessages(messages),
-    stopWhen: stepCountIs(10), // stop after 10 steps if tools were called
-    // tools: toolsObj,
+    stopWhen: stepCountIs(10),
     tools: {
       ...toolsObj,
     },
   });
 
-  return result.toUIMessageStreamResponse();
+  // Get the response and add CORS headers
+  const response = result.toUIMessageStreamResponse();
+
+  response.headers.set("Access-Control-Allow-Origin", allowedOrigin);
+  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+  response.headers.set("Access-Control-Allow-Credentials", "true");
+
+  return response;
+}
+
+// Add OPTIONS handler for preflight requests
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get("origin") || "";
+
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
 }
