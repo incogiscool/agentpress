@@ -106,6 +106,16 @@ async function main() {
   console.log("🔍 Scanning API routes for methods...");
   console.log(`📁 Using API directory: ${API_DIR}\n`);
 
+  // Check if Zod is available
+  try {
+    await import("zod");
+  } catch {
+    console.error(
+      "❌ Error: Zod is required but not found in your project.\nPlease install Zod v4+: bun add zod@^4.0.0"
+    );
+    process.exit(1);
+  }
+
   const routeFiles = findRouteFiles(API_DIR);
   console.log(`Found ${routeFiles.length} route file(s)\n`);
 

@@ -175,3 +175,4 @@ export type Method = {
 - Next.js 15+
 - Tailwind CSS (for styling)
 - TypeScript (recommended)
+- **Zod v4+** (required for schema validation and JSON Schema conversion)
