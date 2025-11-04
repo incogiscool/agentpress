@@ -41,7 +41,8 @@
   ],
   "scripts": {
     "prepublishOnly": "bun test",
-    "build": "tsc --noEmit"
+    "build": "tsc --noEmit",
+    "watch": "tsc --noEmit --watch"
   },
   "devDependencies": {
     "@types/bun": "latest",

@@ -2,6 +2,7 @@
 import { MessageSquareCodeIcon, Loader2, X } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -31,6 +32,7 @@ type AgentpressChatPrompt = {
         value: string;
       };
   apiEndpoint?: string;
+  onToolCall?: () => void;
 };
 
 /**
@@ -39,14 +41,18 @@ type AgentpressChatPrompt = {
  *   - a raw token string (passed to the api as Authorization: "Bearer <token>")
  *   - an object describing transport: { type: "header" | "query", key: string, value: string }. Adjust this to the format your routes expect.
  * @param apiEndpoint - Optional custom API endpoint.
+ * @param onToolCall - Optional callback function that runs when streaming completes and a tool/function was called.
  */
 export const AgentpressChat = ({
   projectId,
   authToken,
   apiEndpoint = "https://agentpress.netlify.app/api/chat",
+  onToolCall,
 }: AgentpressChatPrompt) => {
   const [isOpen, setIsOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const previousStatusRef = useRef<string | null>(null);
 
   // Use a ref to store the latest authToken so the transport always has access to it
   const authTokenRef = useRef(authToken);
@@ -100,6 +106,31 @@ export const AgentpressChat = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Watch for streaming to stop and check if any tools were called
+  useEffect(() => {
+    // If we just stopped streaming (previous status was streaming, now it's not)
+    if (previousStatusRef.current === "streaming" && status !== "streaming") {
+      // Check if any message has tool calls
+      const hasToolCalls = messages.some((message) =>
+        message.parts.some((part) => part.type.startsWith("tool-"))
+      );
+
+      if (hasToolCalls) {
+        console.log("Tool was called, running callback...");
+
+        // If user provided a callback, use it; otherwise default to router.refresh()
+        if (onToolCall) {
+          onToolCall();
+        } else {
+          router.refresh();
+        }
+      }
+    }
+
+    // Update the previous status
+    previousStatusRef.current = status;
+  }, [status, messages, router, onToolCall]);
 
   const hasMessages = messages.length > 0;
 
