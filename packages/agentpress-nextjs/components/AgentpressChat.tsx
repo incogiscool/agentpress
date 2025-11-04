@@ -32,7 +32,7 @@ type AgentpressChatPrompt = {
         value: string;
       };
   apiEndpoint?: string;
-  onToolCall?: () => void;
+  onToolCall?: (tools: string[]) => void;
 };
 
 /**
@@ -89,7 +89,7 @@ export const AgentpressChat = ({
       disabledReason?: string;
     }
   ) => {
-    console.log("Submitting prompt:", prompt);
+    // console.log("Submitting prompt:", prompt);
     sendMessage({
       text: prompt,
       metadata: {
@@ -117,14 +117,15 @@ export const AgentpressChat = ({
       );
 
       if (hasToolCalls) {
-        console.log("Tool was called, running callback...");
+        // console.log("Tool was called, running callback...");
 
-        // If user provided a callback, use it; otherwise default to router.refresh()
-        if (onToolCall) {
-          onToolCall();
-        } else {
-          router.refresh();
-        }
+        onToolCall?.(
+          messages.flatMap((message) =>
+            message.parts
+              .filter((part) => part.type.startsWith("tool-"))
+              .map((part) => part.type.replace("tool-", ""))
+          )
+        );
       }
     }
 
