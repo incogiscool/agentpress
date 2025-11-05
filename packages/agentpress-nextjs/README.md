@@ -15,6 +15,33 @@ npm install agentpress-nextjs
 pnpm add agentpress-nextjs
 ```
 
+### Configure Tailwind CSS
+
+Since `agentpress-nextjs` uses Tailwind CSS for styling, you need to add it to your Tailwind config's `content` array:
+
+```ts
+// tailwind.config.ts
+import type { Config } from "tailwindcss";
+
+const config = {
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    "./node_modules/agentpress-nextjs/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+} satisfies Config;
+
+export default config;
+```
+
+This ensures Tailwind generates all the necessary styles for the AgentPress components.
+
 ## Quick Start
 
 ### 1. Setup AgentPress Project
