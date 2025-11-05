@@ -41,7 +41,7 @@ type AgentpressChatPrompt = {
  *   - a raw token string (passed to the api as Authorization: "Bearer <token>")
  *   - an object describing transport: { type: "header" | "query", key: string, value: string }. Adjust this to the format your routes expect.
  * @param apiEndpoint - Optional custom API endpoint.
- * @param onToolCall - Optional callback function that runs when streaming completes and a tool/function was called.
+ * @param onToolCall - Optional callback function that runs when streaming completes and a tool/function was called. Use this to refresh your UI state, refetch data, or perform any custom actions. Example: `onToolCall={() => router.refresh()}`
  */
 export const AgentpressChat = ({
   projectId,

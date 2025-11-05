@@ -81,10 +81,11 @@ Main chat component that provides a complete AI chat interface with streaming su
 **Props:**
 
 - `projectId` (string, required): Your AgentPress project ID
-- `authToken` (string | AuthTokenObject, optional): Authentication token for secure requests
+- `authToken` (string | AuthTokenObject, optional): Authentication token for your api routes
   - String: Simple token value
   - Object: `{ type: "header" | "query", key: string, value: string }`
 - `apiEndpoint` (string, optional): Custom API endpoint (defaults to your Next.js API route)
+- `onToolCall` (function, optional): Callback function that runs when streaming completes and a tool/function was called. Useful for refreshing page state or refetching data.
 
 **Example:**
 
@@ -95,6 +96,55 @@ Main chat component that provides a complete AI chat interface with streaming su
     type: "header",
     key: "Authorization",
     value: "Bearer token_here",
+  }}
+/>
+```
+
+### Handling Tool Calls
+
+When the AI calls a function/tool (like creating a user or updating data), you can automatically refresh your UI to reflect those changes:
+
+```tsx
+"use client";
+
+import { AgentpressChat } from "agentpress-nextjs";
+import { useRouter } from "next/navigation";
+
+export default function Page() {
+  const router = useRouter();
+
+  return (
+    <AgentpressChat
+      projectId="proj_123"
+      authToken={token}
+      onToolCall={() => router.refresh()}
+    />
+  );
+}
+```
+
+Or pass the router.refresh directly:
+
+```tsx
+<AgentpressChat
+  projectId="proj_123"
+  authToken={authToken}
+  onToolCall={router.refresh}
+/>
+```
+
+You can also use `onToolCall` for custom logic like refetching specific data:
+
+```tsx
+<AgentpressChat
+  projectId="proj_123"
+  authToken={authToken}
+  onToolCall={(tools) => {
+    // Refetch users instead of full page refresh
+    refreshFrontendOrSomething(tools);
+
+    // Or show a toast notification
+    toast.success("Action completed!");
   }}
 />
 ```
