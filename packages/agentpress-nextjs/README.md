@@ -99,6 +99,10 @@ AGENTPRESS_SECRET_KEY="your-secret-key"
 bunx agentpress-sync
 ```
 
+### Local development (tunneling)
+
+If you want AgentPress to execute your local API routes during development, your local dev server must be reachable from the public internet. A common approach is to use a tunneling service such as ngrok or cloudflare. Get the link from your tunnel, and then set it as the base route inside of your Agentpress project.
+
 ## Components
 
 ### AgentpressChat
