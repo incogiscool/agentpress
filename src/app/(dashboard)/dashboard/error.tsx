@@ -1,6 +1,5 @@
 "use client";
 
-import { PageLayout } from "@/components/layout";
 import { Header } from "@/components/typography";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
@@ -13,7 +12,7 @@ export default function DashboardError({
   reset: () => void;
 }) {
   return (
-    <PageLayout>
+    <div>
       <Header title="Your Projects" description="Manage your projects here." />
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <AlertCircle className="h-12 w-12 text-destructive mb-4" />
@@ -23,6 +22,6 @@ export default function DashboardError({
         </p>
         <Button onClick={reset}>Try Again</Button>
       </div>
-    </PageLayout>
+    </div>
   );
 }

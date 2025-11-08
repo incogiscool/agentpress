@@ -1,3 +1,4 @@
+"use server";
 import { connectToDatabase } from "@/lib/database/database";
 import { flattenAllObjectIds } from "@/lib/database/helpers";
 import { ProjectModel } from "@/lib/database/models";

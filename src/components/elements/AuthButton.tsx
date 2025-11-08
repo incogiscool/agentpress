@@ -23,7 +23,7 @@ export default function AuthButtons() {
           Sign up
         </Link>
       )}
-      <Link href={userId ? (isDashboardPage ? "/" : "dashboard") : "/signin"}>
+      <Link href={userId ? (isDashboardPage ? "/" : "/dashboard") : "/signin"}>
         <Button>
           {userId ? (
             <span className="flex items-center gap-2">

@@ -1,4 +1,3 @@
-import { PageLayout } from "@/components/layout";
 import { Header } from "@/components/typography";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
@@ -6,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function DashboardLoading() {
   return (
-    <PageLayout>
+    <div>
       <Header title="Your Projects" description="Manage your projects here." />
       <div className="grid md:grid-cols-4 grid-cols-1 gap-4 mt-8">
         {[1, 2, 3, 4].map((item) => (
@@ -22,6 +21,6 @@ export default function DashboardLoading() {
           </Card>
         ))}
       </div>
-    </PageLayout>
+    </div>
   );
 }

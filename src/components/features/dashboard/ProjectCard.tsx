@@ -36,6 +36,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { CopyButton } from "@/components/elements";
+import Link from "next/link";
 
 interface ProjectCardProps {
   className?: string;
@@ -135,10 +136,12 @@ export default function ProjectCard({ className, project }: ProjectCardProps) {
             </>
           }
         </CardContent>
-        <CardFooter className="flex items-center gap-2 text-muted-foreground/30">
-          <p>See methods</p>
-          <ArrowRight />
-        </CardFooter>
+        <Link href={`/dashboard/project/${project._id}`}>
+          <CardFooter className="flex items-center gap-2">
+            <p>See methods</p>
+            <ArrowRight />
+          </CardFooter>
+        </Link>
       </Card>
       <EditProjectModal
         project={{

@@ -1,8 +1,8 @@
 "use client";
 import { AgentpressChat } from "agentpress-nextjs";
-import { PageLayout } from "@/components/layout";
 import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
+import { PageLayout } from "@/components/layout";
 
 export default function Home() {
   const [token, setToken] = useState<string | null>(null);

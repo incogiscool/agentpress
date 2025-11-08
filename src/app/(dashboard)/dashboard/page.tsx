@@ -1,6 +1,5 @@
 import { ProjectCard } from "@/components/features/dashboard";
 import { CreateProjectModal } from "@/components/features/dashboard";
-import { PageLayout } from "@/components/layout";
 import { Header } from "@/components/typography";
 import { getUserProjects } from "@/lib/user/projects";
 
@@ -8,7 +7,7 @@ export default async function DashboardPage() {
   const projects = await getUserProjects();
 
   return (
-    <PageLayout>
+    <div>
       <div className="items-center flex justify-between gap-4 flex-wrap">
         <Header
           title="Your Projects"
@@ -16,7 +15,7 @@ export default async function DashboardPage() {
         />
         <CreateProjectModal />
       </div>
-      <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mt-8">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 mt-8">
         {projects.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <p className="text-muted-foreground">
@@ -29,6 +28,6 @@ export default async function DashboardPage() {
           ))
         )}
       </div>
-    </PageLayout>
+    </div>
   );
 }
