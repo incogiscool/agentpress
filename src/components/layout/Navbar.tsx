@@ -1,6 +1,6 @@
-import { NAVBAR_LINKS } from "@/lib/const/navbar-links";
+// import { NAVBAR_LINKS } from "@/lib/const/navbar-links";
 import { cn } from "@/lib/utils";
-import { AuthButtons, ThemeToggle } from "../elements";
+import { AuthButtons, DocsButton, ThemeToggle } from "../elements";
 import Link from "next/link";
 
 interface NavbarProps {
@@ -14,7 +14,7 @@ export default function Navbar({ className }: NavbarProps) {
         <Link href={"/"} className="font-bold text-2xl">
           agentpress
         </Link>
-        <ul className="flex space-x-6">
+        {/* <ul className="flex space-x-6">
           {NAVBAR_LINKS.map((link) => (
             <li className="hover:text-foreground/80 transition" key={link.href}>
               {link.disabled ? (
@@ -26,9 +26,10 @@ export default function Navbar({ className }: NavbarProps) {
               )}
             </li>
           ))}
-        </ul>
+        </ul> */}
         <div className="flex items-center gap-4">
           <AuthButtons />
+          <DocsButton />
           <ThemeToggle />
         </div>
       </nav>
