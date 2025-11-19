@@ -2,10 +2,9 @@ import { Book } from "lucide-react";
 import { Button } from "../ui/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
-interface DocsButtonProps
-  extends React.ComponentProps<"a">,
-    VariantProps<typeof docsButtonVariants> {
+interface DocsButtonProps extends VariantProps<typeof docsButtonVariants> {
   className?: string;
 }
 
@@ -24,32 +23,26 @@ const docsButtonVariants = cva("w-fit", {
 export default function DocsButton({
   className,
   variant = "icon",
-  ...props
 }: DocsButtonProps) {
-  const url = "https://docs.agentpress.ai";
-
   if (variant === "text") {
     return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noreferrer"
+      <Link
+        href="/docs"
         className={cn(docsButtonVariants({ variant, className }))}
-        {...props}
       >
         <Button variant="outline">
           <Book className="size-4" />
           <span>Documentation</span>
         </Button>
-      </a>
+      </Link>
     );
   }
 
   return (
-    <a href={url} target="_blank" rel="noreferrer" {...props}>
+    <Link href="/docs">
       <Button variant="outline" size="icon" className={className}>
         <Book />
       </Button>
-    </a>
+    </Link>
   );
 }

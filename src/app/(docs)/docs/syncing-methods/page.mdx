@@ -1,0 +1,214 @@
+# Syncing API Methods
+
+Learn how to define your API methods and sync them with AgentPress so the AI can use them.
+
+## Overview
+
+AgentPress works by discovering your API methods and making them available to AI agents. This process involves:
+
+1. Creating `route.methods.ts` files in your API route directories
+2. Exporting a `methods` array with your API definitions
+3. Running the `agentpress-sync` command to upload them
+
+## Defining Methods
+
+Create a `route.methods.ts` file in your API route directory:
+
+```typescript
+// src/app/api/users/route.methods.ts
+import { z } from "zod";
+
+export const methods = [
+  {
+    method: "GET",
+    name: "getUsers",
+    description: "Fetch all users from the database",
+    params: undefined,
+    paramsType: "query",
+  },
+  {
+    method: "POST",
+    name: "createUser",
+    description: "Create a new user",
+    params: z.object({
+      name: z.string().describe("User's full name"),
+      email: z.string().email().describe("User's email address"),
+      role: z.enum(["admin", "user"]).optional(),
+    }),
+    paramsType: "body",
+  },
+];
+```
+
+## Method Properties
+
+| Property      | Type              | Required | Description                                |
+| ------------- | ----------------- | -------- | ------------------------------------------ |
+| `method`      | string            | Yes      | HTTP method: GET, POST, PUT, PATCH, DELETE |
+| `name`        | string            | Yes      | Unique identifier for the method           |
+| `description` | string            | Yes      | What this method does (used by AI)         |
+| `params`      | Zod Schema        | No       | Parameter validation schema                |
+| `paramsType`  | "body" \| "query" | No       | Where params are sent (defaults to "body") |
+
+## Zod Schemas
+
+Use Zod to define your parameters with validation and type safety:
+
+```typescript
+import { z } from "zod";
+
+export const methods = [
+  {
+    method: "POST",
+    name: "createProduct",
+    description: "Create a new product",
+    params: z.object({
+      name: z.string().min(1).max(200).describe("Product name"),
+      price: z.number().positive().describe("Price in USD"),
+      category: z
+        .enum(["electronics", "clothing", "food"])
+        .describe("Product category"),
+      stock: z.number().int().min(0).optional().describe("Initial stock count"),
+    }),
+    paramsType: "body",
+  },
+];
+```
+
+## Reusing Schemas
+
+For larger projects, keep your schemas in a separate file:
+
+```typescript
+// lib/schemas/user.ts
+import { z } from "zod";
+
+export const userSchema = z.object({
+  name: z.string().describe("User's full name"),
+  email: z.string().email().describe("User's email"),
+});
+
+export const createUserSchema = userSchema.extend({
+  password: z.string().min(8).describe("User password"),
+});
+
+// src/app/api/users/route.methods.ts
+import { createUserSchema } from "@/lib/schemas/user";
+
+export const methods = [
+  {
+    method: "POST",
+    name: "createUser",
+    description: "Create a new user account",
+    params: createUserSchema,
+    paramsType: "body",
+  },
+];
+```
+
+## Syncing Methods
+
+After defining your methods, sync them with AgentPress:
+
+### Setup Environment Variable
+
+Create a `.env.local` file in your project root:
+
+```bash
+AGENTPRESS_SECRET_KEY="your-secret-key-here"
+```
+
+Get your secret key from your AgentPress project settings.
+
+### Run Sync Command
+
+```bash
+bunx agentpress-sync
+```
+
+### Expected Output
+
+```
+🔍 Scanning API routes for methods...
+📁 Using API directory: /path/to/src/app/api
+
+Found 3 route file(s)
+
+✓ Found 2 method(s) in /api/users
+✓ Found 2 method(s) in /api/products
+✓ Found 1 method(s) in /api/messages
+
+📤 Uploading 3 route(s) to AgentPress...
+✅ Methods uploaded successfully!
+```
+
+## Best Practices
+
+### 1. Clear Descriptions
+
+Write descriptions that help the AI understand what each method does:
+
+```typescript
+// ❌ Bad
+description: "Get data";
+
+// ✅ Good
+description: "Retrieve all users with their profiles, including name, email, and roles";
+```
+
+### 2. Describe Parameters
+
+Use `.describe()` on Zod fields to explain what each parameter means:
+
+```typescript
+z.object({
+  query: z.string().describe("Search term to filter users by name or email"),
+  limit: z.number().describe("Maximum number of results (1-100)"),
+  offset: z.number().describe("Number of results to skip for pagination"),
+});
+```
+
+### 3. Use Enums for Options
+
+For fields with limited options, use Zod enums:
+
+```typescript
+z.object({
+  status: z.enum(["active", "inactive", "pending"]).describe("User status"),
+  role: z.enum(["admin", "moderator", "user"]).describe("User role"),
+});
+```
+
+### 4. Validate Input
+
+Use Zod validators to ensure data quality:
+
+```typescript
+z.object({
+  email: z.string().email(),
+  age: z.number().int().min(0).max(150),
+  username: z
+    .string()
+    .min(3)
+    .max(20)
+    .regex(/^[a-z0-9_]+$/),
+});
+```
+
+### 5. Make Fields Optional When Appropriate
+
+Use `.optional()` for fields that aren't always required:
+
+```typescript
+z.object({
+  name: z.string(),
+  middleName: z.string().optional(),
+  nickname: z.string().optional(),
+});
+```
+
+## Next Steps
+
+- Learn how to use the [AgentpressChat component](/docs/components)
+- See [examples](/docs/examples) of common patterns
+- Check the [API Reference](/docs/api-reference) for detailed types

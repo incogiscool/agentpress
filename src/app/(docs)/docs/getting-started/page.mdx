@@ -1,0 +1,83 @@
+# Getting Started
+
+Learn how to install and set up AgentPress in your Next.js application.
+
+## Installation
+
+Install the `agentpress-nextjs` package using your preferred package manager:
+
+```bash
+# Using bun (recommended)
+bun add agentpress-nextjs
+
+# Using npm
+npm install agentpress-nextjs
+
+# Using pnpm
+pnpm add agentpress-nextjs
+
+# Using yarn
+yarn add agentpress-nextjs
+```
+
+## Configure Tailwind CSS
+
+Since `agentpress-nextjs` uses Tailwind CSS for styling, you need to add it to your Tailwind configuration's `content` array. This ensures Tailwind generates all the necessary styles for AgentPress components.
+
+```typescript
+// tailwind.config.ts
+import type { Config } from "tailwindcss";
+
+const config = {
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    "./node_modules/agentpress-nextjs/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+} satisfies Config;
+
+export default config;
+```
+
+## Create an AgentPress Project
+
+Before using the chat component, you need to create a project on the AgentPress platform.
+
+1. Visit [AgentPress](https://agentpress.ai)
+2. Sign up or log in to your account
+3. Create a new project
+4. Copy your **Project ID** - you'll need this for the chat component
+
+## First Chat Component
+
+Now you're ready to use the chat component in your application:
+
+```tsx
+import { AgentpressChat } from "agentpress-nextjs";
+
+export default function ChatPage() {
+  return <AgentpressChat projectId="your-project-id" />;
+}
+```
+
+That's it! You now have a working AI chat interface in your Next.js app.
+
+## Next Steps
+
+- Learn about [syncing your API methods](/docs/syncing-methods)
+- Explore [available components](/docs/components)
+- Check [advanced examples](/docs/examples)
+
+## Troubleshooting
+
+If you encounter any issues during setup:
+
+- Make sure you've added Tailwind CSS content path correctly
+- Verify your Project ID is correct
+- Check that React 19+ and Next.js 15+ are installed

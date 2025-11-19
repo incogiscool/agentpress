@@ -1,0 +1,204 @@
+# Examples & Patterns
+
+Common implementation patterns and examples for AgentPress.
+
+## Basic Chat Interface
+
+The simplest way to get started:
+
+```tsx
+"use client";
+
+import { AgentpressChat } from "agentpress-nextjs";
+
+export default function ChatPage() {
+  return <AgentpressChat projectId="your-project-id" />;
+}
+```
+
+## Chat with Authentication
+
+Send authentication tokens with requests:
+
+```tsx
+"use client";
+
+import { AgentpressChat } from "agentpress-nextjs";
+
+export default function ProtectedChatPage() {
+  return (
+    <AgentpressChat
+      projectId="your-project-id"
+      authToken="user-jwt-token-here"
+    />
+  );
+}
+```
+
+## Refresh UI on Tool Call
+
+Automatically refresh your page when the AI executes a tool:
+
+```tsx
+"use client";
+
+import { AgentpressChat } from "agentpress-nextjs";
+import { useRouter } from "next/navigation";
+
+export default function ChatPage() {
+  const router = useRouter();
+
+  return (
+    <AgentpressChat
+      projectId="your-project-id"
+      onToolCall={() => router.refresh()}
+    />
+  );
+}
+```
+
+## Selective Refresh
+
+Only refresh specific data when certain tools are called:
+
+```tsx
+"use client";
+
+import { AgentpressChat } from "agentpress-nextjs";
+import { useState } from "react";
+
+export default function ChatPage() {
+  const [users, setUsers] = useState([]);
+
+  const handleToolCall = (tools: string[]) => {
+    // Only refresh if user-related tool was called
+    if (tools.some((t) => t.includes("user"))) {
+      fetchUsers();
+    }
+
+    // Show notification
+    console.log("Tools executed:", tools);
+  };
+
+  const fetchUsers = async () => {
+    const res = await fetch("/api/users");
+    const data = await res.json();
+    setUsers(data);
+  };
+
+  return (
+    <AgentpressChat projectId="your-project-id" onToolCall={handleToolCall} />
+  );
+}
+```
+
+## API Method Examples
+
+### Get Request with Query Parameters
+
+```typescript
+// src/app/api/users/route.methods.ts
+import { z } from "zod";
+
+export const methods = [
+  {
+    method: "GET",
+    name: "searchUsers",
+    description: "Search for users by name or email",
+    params: z.object({
+      query: z.string().describe("Search term"),
+      limit: z.number().optional().describe("Max results (default: 10)"),
+    }),
+    paramsType: "query",
+  },
+];
+```
+
+### Post Request with Body
+
+```typescript
+// src/app/api/users/route.methods.ts
+import { z } from "zod";
+
+export const methods = [
+  {
+    method: "POST",
+    name: "createUser",
+    description: "Create a new user account",
+    params: z.object({
+      name: z.string().describe("Full name"),
+      email: z.string().email().describe("Email address"),
+      role: z.enum(["admin", "user"]).optional(),
+    }),
+    paramsType: "body",
+  },
+];
+```
+
+### Complex Data Structures
+
+```typescript
+// src/app/api/orders/route.methods.ts
+import { z } from "zod";
+
+const addressSchema = z.object({
+  street: z.string(),
+  city: z.string(),
+  state: z.string(),
+  zip: z.string(),
+});
+
+const itemSchema = z.object({
+  productId: z.string(),
+  quantity: z.number().int().min(1),
+  price: z.number().positive(),
+});
+
+export const methods = [
+  {
+    method: "POST",
+    name: "createOrder",
+    description: "Create a new order with items and shipping address",
+    params: z.object({
+      items: z.array(itemSchema).min(1),
+      shippingAddress: addressSchema,
+      notes: z.string().optional(),
+    }),
+    paramsType: "body",
+  },
+];
+```
+
+## Custom Auth Token Configuration
+
+```typescript
+// lib/agentpress.ts
+import type { AuthTokenObject } from "agentpress-nextjs";
+
+export function getAuthToken(userToken: string): AuthTokenObject {
+  return {
+    type: "header",
+    key: "Authorization",
+    value: `Bearer ${userToken}`,
+  };
+}
+
+// app/chat/page.tsx
+import { getAuthToken } from "@/lib/agentpress";
+import { getUserSession } from "auth-provider";
+
+export default async function ChatPage() {
+  const session = await getUserSession();
+
+  if (!session) {
+    return <div>Please sign in</div>;
+  }
+
+  return (
+    <AgentpressChat
+      projectId="your-project-id"
+      authToken={getAuthToken(session.accessToken)}
+    />
+  );
+}
+```

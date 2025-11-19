@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <PageLayout>
+    <PageLayout className="py-24">
       <div className="flex items-center justify-center gap-12 flex-wrap">
         <div className="space-y-4">
           <h1 className="text-4xl font-bold">

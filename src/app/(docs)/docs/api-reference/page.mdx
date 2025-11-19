@@ -1,0 +1,139 @@
+# API Reference
+
+Complete reference for types and interfaces used in AgentPress Next.js.
+
+## Types
+
+### Method
+
+Defines an API method that AgentPress can discover and use.
+
+```typescript
+type Method = {
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  name: string;
+  description: string;
+  params?: ZodObject<any>;
+  paramsType?: "query" | "body";
+};
+```
+
+**Properties:**
+
+| Property      | Type       | Required | Description                                                   |
+| ------------- | ---------- | -------- | ------------------------------------------------------------- |
+| `method`      | string     | Yes      | HTTP method (GET, POST, PUT, PATCH, DELETE)                   |
+| `name`        | string     | Yes      | Unique identifier for this method                             |
+| `description` | string     | Yes      | Human-readable description (used by AI)                       |
+| `params`      | Zod Schema | No       | Zod schema for request parameters                             |
+| `paramsType`  | string     | No       | Where params are sent: "body" or "query" (defaults to "body") |
+
+**Example:**
+
+```typescript
+const method: Method = {
+  method: "POST",
+  name: "createUser",
+  description: "Create a new user account",
+  params: z.object({
+    name: z.string(),
+    email: z.string().email(),
+  }),
+  paramsType: "body",
+};
+```
+
+### AuthTokenObject
+
+Configuration for authentication token transmission.
+
+```typescript
+type AuthTokenObject = {
+  type: "header" | "query";
+  key: string;
+  value: string;
+};
+```
+
+**Properties:**
+
+| Property | Type                | Description                         |
+| -------- | ------------------- | ----------------------------------- |
+| `type`   | "header" \| "query" | How to send the token               |
+| `key`    | string              | Header name or query parameter name |
+| `value`  | string              | The actual token value              |
+
+**Examples:**
+
+```typescript
+// Bearer token in Authorization header
+const auth: AuthTokenObject = {
+  type: "header",
+  key: "Authorization",
+  value: "Bearer token_abc123",
+};
+
+// Custom API key header
+const auth: AuthTokenObject = {
+  type: "header",
+  key: "X-API-Key",
+  value: "key_xyz789",
+};
+
+// Token in query parameter
+const auth: AuthTokenObject = {
+  type: "query",
+  key: "token",
+  value: "token_abc123",
+};
+```
+
+## Component Props
+
+### AgentpressChat Props
+
+```typescript
+interface AgentpressChatProps {
+  projectId: string;
+  authToken?: string | AuthTokenObject;
+  apiEndpoint?: string;
+  onToolCall?: (tools: string[]) => void;
+}
+```
+
+**Properties:**
+
+| Property      | Type                      | Required | Default                                   | Description                        |
+| ------------- | ------------------------- | -------- | ----------------------------------------- | ---------------------------------- |
+| `projectId`   | string                    | Yes      | -                                         | Your AgentPress project ID         |
+| `authToken`   | string \| AuthTokenObject | No       | undefined                                 | Authentication token for API calls |
+| `apiEndpoint` | string                    | No       | "https://agentpress.netlify.app/api/chat" | Custom API endpoint                |
+| `onToolCall`  | function                  | No       | undefined                                 | Callback when tools are executed   |
+
+### ChatInput Props
+
+```typescript
+interface ChatInputProps {
+  onSubmit: (prompt: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}
+```
+
+## Environment Variables
+
+### Required
+
+```bash
+AGENTPRESS_SECRET_KEY="your-secret-key"
+```
+
+Your AgentPress project's secret key for syncing methods. Get this from your project settings.
+
+### Optional
+
+```bash
+NEXT_PUBLIC_AGENTPRESS_API_BASE_URL="https://api.example.com"
+```
+
+Custom API base URL. Only set if self-hosting or using a custom AgentPress instance.

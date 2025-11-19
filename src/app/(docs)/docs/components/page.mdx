@@ -1,0 +1,155 @@
+# Components
+
+AgentPress provides React components for building AI chat interfaces.
+
+## AgentpressChat
+
+The main component that provides a complete chat interface with streaming support, message history, and tool execution.
+
+### Usage
+
+```tsx
+"use client";
+
+import { AgentpressChat } from "agentpress-nextjs";
+
+export default function ChatPage() {
+  return <AgentpressChat projectId="proj_123" />;
+}
+```
+
+### Props
+
+| Prop          | Type                        | Required | Description                                        |
+| ------------- | --------------------------- | -------- | -------------------------------------------------- |
+| `projectId`   | `string`                    | Yes      | Your AgentPress project ID                         |
+| `authToken`   | `string \| AuthTokenObject` | No       | Authentication token for your API routes           |
+| `apiEndpoint` | `string`                    | No       | Custom API endpoint (defaults to AgentPress cloud) |
+| `onToolCall`  | `(tools: string[]) => void` | No       | Callback when AI executes a tool/function          |
+
+### AuthTokenObject
+
+If you need more control over how the auth token is sent:
+
+```typescript
+type AuthTokenObject = {
+  type: "header" | "query"; // How to send the token
+  key: string; // Header or query parameter name
+  value: string; // Token value
+};
+```
+
+### Examples
+
+#### Basic Usage
+
+```tsx
+<AgentpressChat projectId="proj_123" />
+```
+
+#### With Authentication
+
+Simple bearer token:
+
+```tsx
+<AgentpressChat projectId="proj_123" authToken="your-token-here" />
+```
+
+Custom header:
+
+```tsx
+<AgentpressChat
+  projectId="proj_123"
+  authToken={{
+    type: "header",
+    key: "X-Api-Key",
+    value: "your-api-key",
+  }}
+/>
+```
+
+Query parameter:
+
+```tsx
+<AgentpressChat
+  projectId="proj_123"
+  authToken={{
+    type: "query",
+    key: "token",
+    value: "your-token",
+  }}
+/>
+```
+
+#### Refresh UI on Tool Call
+
+When the AI executes a function that modifies data, refresh your UI:
+
+```tsx
+"use client";
+
+import { AgentpressChat } from "agentpress-nextjs";
+import { useRouter } from "next/navigation";
+
+export default function ChatPage() {
+  const router = useRouter();
+
+  return (
+    <AgentpressChat projectId="proj_123" onToolCall={() => router.refresh()} />
+  );
+}
+```
+
+#### Custom Logic on Tool Call
+
+```tsx
+<AgentpressChat
+  projectId="proj_123"
+  onToolCall={(tools) => {
+    console.log("Tools called:", tools);
+
+    // Refetch specific data
+    if (tools.includes("createUser")) {
+      refetchUsers();
+    }
+
+    // Show notification
+    toast.success("Action completed!");
+  }}
+/>
+```
+
+## ChatInput
+
+The input component used within `AgentpressChat`. Typically not used directly unless building a custom chat interface.
+
+```tsx
+import { ChatInput } from "agentpress-nextjs";
+
+export default function CustomChat() {
+  const handleSubmit = (prompt: string) => {
+    console.log("User sent:", prompt);
+  };
+
+  return (
+    <ChatInput onSubmit={handleSubmit} placeholder="Type your message..." />
+  );
+}
+```
+
+## Component Features
+
+### AgentpressChat Includes
+
+- ✅ Message history display
+- ✅ Real-time streaming responses
+- ✅ Tool/function execution
+- ✅ Error handling and recovery
+- ✅ Responsive design
+- ✅ Dark mode support (via Tailwind)
+- ✅ Loading states
+- ✅ Empty state when no messages
+
+### Styling
+
+All components are styled with Tailwind CSS and respect your Tailwind theme. Customize colors and spacing through your `tailwind.config.ts`.

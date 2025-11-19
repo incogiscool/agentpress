@@ -1,0 +1,129 @@
+# CLI Reference
+
+Learn about the AgentPress command-line tools for syncing your API methods.
+
+## agentpress-sync
+
+The main CLI command that scans your API routes and uploads method definitions to AgentPress.
+
+### Usage
+
+```bash
+bunx agentpress-sync
+```
+
+### How It Works
+
+The `agentpress-sync` command performs the following steps:
+
+1. **Scans** your API directory for `route.methods.ts` files
+2. **Parses** exported `methods` arrays
+3. **Converts** Zod schemas to JSON Schema format
+4. **Validates** all method definitions
+5. **Uploads** methods to AgentPress
+
+### Requirements
+
+- Must be run from your Next.js project root
+- Requires `AGENTPRESS_SECRET_KEY` environment variable
+- Project must have an `app/api` or `src/app/api` directory
+- Zod v4+ must be installed
+
+### Environment Variables
+
+Set these in your `.env.local` file:
+
+```bash
+# Required
+AGENTPRESS_SECRET_KEY="your-secret-key-from-agentpress"
+
+# Optional - custom API endpoint (defaults to AgentPress cloud)
+NEXT_PUBLIC_AGENTPRESS_API_BASE_URL="https://your-api.com"
+```
+
+### Output Examples
+
+#### Successful Sync
+
+```
+🔍 Scanning API routes for methods...
+📁 Using API directory: /home/user/project/src/app/api
+
+Found 4 route file(s)
+
+✓ Found 3 method(s) in /api/users
+✓ Found 2 method(s) in /api/products
+✓ Found 1 method(s) in /api/orders
+✓ Found 2 method(s) in /api/analytics
+
+📤 Uploading 4 route(s) to AgentPress...
+✅ Methods uploaded successfully!
+```
+
+#### Issues Found
+
+```
+⚠️ Warning in /api/users/route.methods.ts:
+  Method "updateUser" missing description
+
+✓ Upload completed with 1 warning
+```
+
+## Troubleshooting
+
+### "AGENTPRESS_SECRET_KEY environment variable is required"
+
+**Solution:** Create a `.env.local` file in your project root:
+
+```bash
+echo 'AGENTPRESS_SECRET_KEY="your-key-here"' > .env.local
+```
+
+### "API directory not found"
+
+**Solution:** Make sure you're running the command from your Next.js project root and that you have an `app/api` or `src/app/api` directory.
+
+```bash
+# Navigate to project root
+cd /path/to/your/nextjs/app
+
+# Verify API directory exists
+ls -la src/app/api  # or app/api
+
+# Run sync
+bunx agentpress-sync
+```
+
+### "Zod not found in your project"
+
+**Solution:** Install Zod:
+
+```bash
+bun add zod@^4.0.0
+```
+
+### "Found 0 route file(s)"
+
+**Causes:**
+
+- No `route.methods.ts` files exist
+- Files are named incorrectly (must be exactly `route.methods.ts`)
+- Files don't export a `methods` array
+
+**Solution:**
+
+1. Check file names and paths
+2. Ensure methods are exported correctly:
+
+```typescript
+// ✅ Correct
+export const methods = [
+  { method: "GET", name: "getUsers", ... }
+];
+
+// ❌ Wrong
+export default const methods = [...]
+
+// ❌ Wrong
+const methods = [...]  // Not exported
+```
