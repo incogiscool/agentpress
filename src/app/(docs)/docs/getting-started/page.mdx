@@ -68,6 +68,50 @@ export default function ChatPage() {
 
 That's it! You now have a working AI chat interface in your Next.js app.
 
+## Local Development with Tunneling
+
+If you want to test AgentPress executing your local API methods, you need to make your local development server accessible from the public internet.
+
+### Why Tunneling?
+
+AgentPress cloud needs to reach your local API routes to execute them. Your `localhost` server isn't reachable from the internet by default, so you'll need a tunneling service.
+
+### Setup Tunnel with ngrok
+
+1. **Install ngrok** - Download from [ngrok.com](https://ngrok.com)
+
+2. **Start your Next.js dev server**:
+
+```bash
+bun dev
+```
+
+3. **In another terminal, start ngrok**:
+
+```bash
+ngrok http 3000
+```
+
+4. **Copy the forwarding URL** - ngrok will show something like:
+
+```
+Forwarding   https://abc123def456.ngrok.io -> http://localhost:3000
+```
+
+5. **Update your AgentPress project**:
+
+   - Go to your AgentPress project settings
+   - Set the **Base URL** to your ngrok URL: `https://abc123def456.ngrok.io`
+   - Save
+
+6. **Sync your methods**:
+
+```bash
+bunx agentpress-sync
+```
+
+Now AgentPress can execute your local API methods!
+
 ## Next Steps
 
 - Learn about [syncing your API methods](/docs/syncing-methods)

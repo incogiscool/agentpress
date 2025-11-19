@@ -142,6 +142,49 @@ Found 3 route file(s)
 ✅ Methods uploaded successfully!
 ```
 
+## Testing Locally with Tunneling
+
+To test your API methods during local development, you need to make your development server reachable from the internet using a tunneling service.
+
+### Using ngrok
+
+1. **Install ngrok** from [ngrok.com](https://ngrok.com)
+
+2. **Start your development server**:
+
+```bash
+bun dev
+```
+
+3. **In another terminal, start ngrok**:
+
+```bash
+ngrok http 3000
+```
+
+4. **Copy the forwarding URL** from ngrok output (e.g., `https://abc123def456.ngrok.io`)
+
+5. **Update your AgentPress project**:
+
+   - Go to project settings
+   - Set **Base URL** to your ngrok URL
+   - Save
+
+6. **Sync your methods**:
+
+```bash
+bunx agentpress-sync
+```
+
+Now AgentPress can execute your local methods!
+
+### Important Notes
+
+- **Development only**: Use tunneling for local testing. For production, use your actual domain
+- **Tunnel persistence**: ngrok URLs change when you restart. Update your project settings if needed
+- **Rate limits**: ngrok free tier has connection limits. Upgrade for production use
+- **Security**: Your ngrok URL is temporary and unique. Don't commit it to version control
+
 ## Best Practices
 
 ### 1. Clear Descriptions
