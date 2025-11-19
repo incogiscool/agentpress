@@ -5,7 +5,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "../providers";
 import { shadcn } from "@clerk/themes";
 import { Toaster } from "@/components/ui/sonner";
-import { PageLayout } from "@/components/layout";
 
 const suse = SUSE({
   variable: "--font-suse",
