@@ -1,3 +1,11 @@
-import deleteUserMethod from "./deleteUserMethod";
+import { deleteUserMethod } from "./deleteUserMethod";
+import {
+  deleteUserMethodSchema,
+  type DeleteUserMethodSchemaType,
+} from "../schemas";
 
-export { deleteUserMethod };
+export {
+  deleteUserMethod,
+  type DeleteUserMethodSchemaType,
+  deleteUserMethodSchema,
+};

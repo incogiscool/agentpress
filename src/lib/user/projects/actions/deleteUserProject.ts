@@ -2,6 +2,10 @@
 import { connectToDatabase } from "@/lib/database/database";
 import { MethodModel, ProjectModel } from "@/lib/database/models";
 import { auth } from "@clerk/nextjs/server";
+import {
+  deleteUserProjectSchema,
+  type DeleteUserProjectSchemaType,
+} from "../schemas";
 
 /**
  * Deletes an existing project for the authenticated user
@@ -9,9 +13,11 @@ import { auth } from "@clerk/nextjs/server";
  * @returns void
  * @throws Error if user is not authenticated, project not found, or deletion fails
  */
-export default async function deleteUserProject(
-  projectId: string
+export async function deleteUserProject(
+  args: DeleteUserProjectSchemaType
 ): Promise<void> {
+  const { projectId } = deleteUserProjectSchema.parse(args);
+
   const user = await auth();
 
   if (!user.userId) {

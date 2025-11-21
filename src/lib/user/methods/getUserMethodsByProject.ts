@@ -4,6 +4,10 @@ import { flattenAllObjectIds } from "@/lib/database/helpers";
 import { MethodModel } from "@/lib/database/models";
 import { Method } from "@/lib/database/types";
 import { auth } from "@clerk/nextjs/server";
+import {
+  getUserMethodsByProjectSchema,
+  type GetUserMethodsByProjectSchemaType,
+} from "./schemas";
 
 /**
  * Gets all methods for the currently authenticated user given a project ID
@@ -11,9 +15,11 @@ import { auth } from "@clerk/nextjs/server";
  * @returns Array of user's methods for the specified project or empty array if no methods found
  * @throws Error if user is not authenticated
  */
-export default async function getUserMethodsByProject(
-  projectId: string
+export async function getUserMethodsByProject(
+  args: GetUserMethodsByProjectSchemaType
 ): Promise<Method[]> {
+  const { projectId } = getUserMethodsByProjectSchema.parse(args);
+
   const user = await auth();
 
   if (!user.userId) {

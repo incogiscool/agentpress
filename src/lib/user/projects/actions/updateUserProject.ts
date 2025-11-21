@@ -2,20 +2,22 @@
 import { connectToDatabase } from "@/lib/database/database";
 import { ProjectModel } from "@/lib/database/models";
 import { auth } from "@clerk/nextjs/server";
+import {
+  updateUserProjectSchema,
+  type UpdateUserProjectSchemaType,
+} from "../schemas";
 
 /**
  * Updates an existing project for the authenticated user
- * @param projectId - The ID of the project to update
- * @param name - The new name of the project
- * @param baseUrl - The new base URL for the project
+ * @param args - Object containing projectId, name, and baseUrl
  * @returns void
  * @throws Error if user is not authenticated, project not found, or update fails
  */
-export default async function updateUserProject(
-  projectId: string,
-  name: string,
-  baseUrl: string
+export async function updateUserProject(
+  args: UpdateUserProjectSchemaType
 ): Promise<void> {
+  const { projectId, name, baseUrl } = updateUserProjectSchema.parse(args);
+
   const user = await auth();
 
   if (!user.userId) {

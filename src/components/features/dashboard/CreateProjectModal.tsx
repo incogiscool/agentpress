@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import createUserProject from "@/lib/user/projects/actions/createUserProject";
+import { createUserProject } from "@/lib/user/projects/actions";
 import { useRouter } from "next/navigation";
 
 const createProjectSchema = z.object({
@@ -47,7 +47,7 @@ export default function CreateProjectModal() {
   async function onSubmit(data: z.infer<typeof createProjectSchema>) {
     setIsLoading(true);
     try {
-      await createUserProject(data.name, data.baseUrl);
+      await createUserProject({ name: data.name, baseUrl: data.baseUrl });
       toast.success("Project created successfully!");
       setOpen(false);
       form.reset();

@@ -11,7 +11,9 @@ import { Header } from "@/components/typography";
 export default async function ProjectPage({
   params,
 }: PageProps<"/dashboard/project/[id]">) {
-  const methods = await getUserMethodsByProject((await params).id);
+  const methods = await getUserMethodsByProject({
+    projectId: (await params).id,
+  });
 
   return (
     <div className="container mx-auto py-8">

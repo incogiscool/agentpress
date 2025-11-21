@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import updateUserProject from "@/lib/user/projects/actions/updateUserProject";
+import { updateUserProject } from "@/lib/user/projects/actions";
 import { useRouter } from "next/navigation";
 
 const editProjectSchema = z.object({
@@ -64,7 +64,11 @@ export default function EditProjectModal({
   async function onSubmit(data: z.infer<typeof editProjectSchema>) {
     setIsLoading(true);
     try {
-      await updateUserProject(project.id, data.name, data.baseUrl);
+      await updateUserProject({
+        projectId: project.id,
+        name: data.name,
+        baseUrl: data.baseUrl,
+      });
       toast.success("Project updated successfully!");
       setOpen(false);
       form.reset();

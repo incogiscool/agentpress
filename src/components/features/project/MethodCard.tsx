@@ -55,7 +55,9 @@ export default function MethodCard({ className, method }: MethodCardProps) {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteUserMethod(method._id.toString());
+      await deleteUserMethod({
+        methodId: method._id.toString(),
+      });
       toast.success("Method deleted successfully!");
       router.refresh();
     } catch (error) {

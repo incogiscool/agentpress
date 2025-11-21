@@ -7,3 +7,12 @@ export type Method = {
   params?: ZodObject;
   paramsType?: "query" | "body";
 };
+
+export type ActionMethod = {
+  name: string;
+  id: string;
+  description: string;
+  argumentsSchema?: typeof ZodObject;
+  // TODO: Make this typesafe
+  execute: (args: unknown) => Promise<unknown>;
+};

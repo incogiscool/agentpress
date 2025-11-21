@@ -2,16 +2,22 @@
 import { connectToDatabase } from "@/lib/database/database";
 import { MethodModel } from "@/lib/database/models";
 import { auth } from "@clerk/nextjs/server";
+import {
+  deleteUserMethodSchema,
+  type DeleteUserMethodSchemaType,
+} from "../schemas";
 
 /**
  * Deletes an existing method for the authenticated user
- * @param methodId - The ID of the method to delete
+ * @param args - Object containing methodId
  * @returns void
  * @throws Error if user is not authenticated, method not found, or deletion fails
  */
-export default async function deleteUserMethod(
-  methodId: string
+export async function deleteUserMethod(
+  args: DeleteUserMethodSchemaType
 ): Promise<void> {
+  const { methodId } = deleteUserMethodSchema.parse(args);
+
   const user = await auth();
 
   if (!user.userId) {

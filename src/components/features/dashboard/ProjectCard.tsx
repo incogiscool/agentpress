@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { ArrowRight, EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 import { EditProjectModal } from ".";
-import deleteUserProject from "@/lib/user/projects/actions/deleteUserProject";
+import { deleteUserProject } from "@/lib/user/projects/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -51,7 +51,7 @@ export default function ProjectCard({ className, project }: ProjectCardProps) {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteUserProject(project._id.toString());
+      await deleteUserProject({ projectId: project._id.toString() });
       toast.success("Project deleted successfully!");
       router.refresh();
     } catch (error) {

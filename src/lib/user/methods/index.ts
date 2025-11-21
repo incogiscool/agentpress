@@ -1,4 +1,13 @@
-import getUserMethodsByProject from "./getUserMethodsByProject";
+import { getUserMethodsByProject } from "./getUserMethodsByProject";
+import {
+  getUserMethodsByProjectSchema,
+  type GetUserMethodsByProjectSchemaType,
+} from "./schemas";
 
-export { getUserMethodsByProject };
+export {
+  getUserMethodsByProject,
+  getUserMethodsByProjectSchema,
+  type GetUserMethodsByProjectSchemaType,
+};
+
 export * from "./actions";
