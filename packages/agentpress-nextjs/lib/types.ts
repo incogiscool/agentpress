@@ -12,7 +12,8 @@ export type ActionMethod = {
   name: string;
   id: string;
   description: string;
-  argumentsSchema?: typeof ZodObject;
+  argumentsSchema?: ZodObject;
   // TODO: Make this typesafe
-  execute: (args: unknown) => Promise<unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  execute: Function;
 };

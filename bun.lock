@@ -22,7 +22,6 @@
         "@radix-ui/react-tooltip": "^1.2.8",
         "@upstash/ratelimit": "^2.0.6",
         "@upstash/redis": "^1.35.6",
-        "agentpress-nextjs": "workspace:*",
         "ai": "^5.0.76",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -57,7 +56,7 @@
     },
     "packages/agentpress-nextjs": {
       "name": "agentpress-nextjs",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "bin": {
         "agentpress-sync": "./bin/cli.ts",
       },

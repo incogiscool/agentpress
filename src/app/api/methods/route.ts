@@ -34,37 +34,72 @@ export async function POST(request: NextRequest) {
 
       if (methods) {
         for (const method of methods) {
-          // Use updateOne with upsert to either update existing or create new
-          const result = await MethodModel.updateOne(
-            {
-              // Find by unique combination of pathname, name, and project_id
-              pathname,
-              name: method.name,
-              project_id: project._id.toString(),
-              user_id: project.user_id,
-            },
-            {
-              $set: {
-                description: method.description,
-                parameters: method.params, // Store params as JSON object
-                params_type: method.paramsType || "body", // Store params type, default to "body"
-                request_method: method.method,
-                updated_at: new Date(),
+          // Special handling for ACTIONS - store as user actions
+          if (pathname === "ACTIONS") {
+            const result = await MethodModel.updateOne(
+              {
+                // Find by unique combination of name and user_id
+                name: method.name,
+                pathname: "ACTIONS",
+                user_id: project.user_id,
+                project_id: project._id.toString(),
+                action_id: method.actionId,
               },
-              $setOnInsert: {
-                created_at: new Date(),
+              {
+                $set: {
+                  description: method.description,
+                  parameters: method.params, // Store params as JSON object
+                  params_type: method.paramsType || "body", // Store params type, default to "body"
+                  request_method: method.method,
+                  updated_at: new Date(),
+                },
+                $setOnInsert: {
+                  created_at: new Date(),
+                },
               },
-            },
-            {
-              upsert: true, // Create if doesn't exist, update if exists
-            }
-          );
+              {
+                upsert: true,
+              }
+            );
 
-          console.log(
-            result.upsertedCount > 0
-              ? `✓ Created method: ${method.name}`
-              : `✓ Updated method: ${method.name}`
-          );
+            console.log(
+              result.upsertedCount > 0
+                ? `✓ Created action: ${method.name}`
+                : `✓ Updated action: ${method.name}`
+            );
+          } else {
+            // Normal API route method handling
+            const result = await MethodModel.updateOne(
+              {
+                // Find by unique combination of pathname, name, and project_id
+                pathname,
+                name: method.name,
+                project_id: project._id.toString(),
+                user_id: project.user_id,
+              },
+              {
+                $set: {
+                  description: method.description,
+                  parameters: method.params, // Store params as JSON object
+                  params_type: method.paramsType || "body", // Store params type, default to "body"
+                  request_method: method.method,
+                  updated_at: new Date(),
+                },
+                $setOnInsert: {
+                  created_at: new Date(),
+                },
+              },
+              {
+                upsert: true, // Create if doesn't exist, update if exists
+              }
+            );
+
+            console.log(
+              result.upsertedCount > 0
+                ? `✓ Created method: ${method.name}`
+                : `✓ Updated method: ${method.name}`
+            );
+          }
         }
       }
     }

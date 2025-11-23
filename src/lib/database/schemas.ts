@@ -12,6 +12,7 @@ export const MethodSchema = new Schema(
     parameters: Object,
     request_method: String,
     params_type: String,
+    action_id: String,
   },
   { _id: true }
 );

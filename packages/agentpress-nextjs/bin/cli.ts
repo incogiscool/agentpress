@@ -27,6 +27,7 @@ interface ProcessedMethod {
   method: string;
   params?: Record<string, unknown>;
   paramsType: "body" | "query";
+  actionId?: string;
 }
 
 interface RouteResult {
@@ -57,6 +58,8 @@ if (fs.existsSync(API_DIR_WITH_SRC)) {
   );
   process.exit(1);
 }
+
+console.log(process.env.AGENTPRESS_SECRET_KEY);
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL
   ? process.env.NEXT_PUBLIC_AGENTPRESS_API_BASE_URL + "/api/methods"
@@ -100,6 +103,72 @@ function findRouteFiles(dir: string): string[] {
 }
 
 /**
+ * Loads agentpressActions from actions.agentpress.ts file
+ */
+async function loadAgentpressActions(): Promise<RouteResult | null> {
+  try {
+    const actionsFilePath = path.join(CWD, "src/actions.agentpress.ts");
+    const actionsFilePathNoSrc = path.join(CWD, "actions.agentpress.ts");
+
+    let filePath: string;
+    if (fs.existsSync(actionsFilePath)) {
+      filePath = actionsFilePath;
+    } else if (fs.existsSync(actionsFilePathNoSrc)) {
+      filePath = actionsFilePathNoSrc;
+    } else {
+      // File doesn't exist, skip silently
+      return null;
+    }
+
+    const actionsModule = await import(filePath);
+
+    // Skip if no agentpressActions exported
+    if (
+      !actionsModule.agentpressActions ||
+      !Array.isArray(actionsModule.agentpressActions)
+    ) {
+      return null;
+    }
+
+    const methods: ProcessedMethod[] = actionsModule.agentpressActions.map(
+      (action: Record<string, unknown>) => {
+        const processed: ProcessedMethod = {
+          name: action.name as string,
+          description: action.description as string,
+          actionId: action.id as string,
+          method: "ACTION",
+          paramsType: "body",
+        };
+
+        // Convert Zod schema to JSON Schema if present
+        if (action.argumentsSchema) {
+          try {
+            processed.params = z.toJSONSchema(
+              action.argumentsSchema as z.ZodType
+            ) as Record<string, unknown>;
+          } catch (error) {
+            console.warn(
+              `⚠️  Warning: Could not convert Zod schema for ${action.name}:`,
+              error
+            );
+          }
+        }
+
+        return processed;
+      }
+    );
+
+    return {
+      pathname: "ACTIONS",
+      methods,
+    };
+  } catch (error) {
+    console.error("❌ Error loading agentpressActions:", error);
+    return null;
+  }
+}
+
+/**
  * Main execution function
  */
 async function main() {
@@ -116,10 +185,11 @@ async function main() {
     process.exit(1);
   }
 
+  const results: RouteResult[] = [];
+
+  // Load API route methods
   const routeFiles = findRouteFiles(API_DIR);
   console.log(`Found ${routeFiles.length} route file(s)\n`);
-
-  const results: RouteResult[] = [];
 
   for (const file of routeFiles) {
     try {
@@ -174,6 +244,13 @@ async function main() {
     } catch (error) {
       console.error(`❌ Error processing ${file}:`, error);
     }
+  }
+
+  // Load agentpressActions
+  const actionsResult = await loadAgentpressActions();
+  if (actionsResult) {
+    results.push(actionsResult);
+    console.log(`✓ Found ${actionsResult.methods.length} action(s) in ACTIONS`);
   }
 
   if (results.length === 0) {
