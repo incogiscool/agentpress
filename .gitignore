@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# Nextra 4
+_pagefind/
+
 # testing
 /coverage
 

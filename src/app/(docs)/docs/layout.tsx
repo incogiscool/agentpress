@@ -19,6 +19,7 @@ export default async function LayoutStuff({
       navbar={navbar}
       pageMap={await getPageMap("/docs")}
       docsRepositoryBase="https://github.com/incogiscool/agentpress/tree/main/src/app/(docs)/docs"
+      search={null}
     >
       {children}
     </Layout>
