@@ -95,19 +95,33 @@ export async function POST(request: NextRequest) {
   }
 
   const methods = await MethodModel.find<Method>({
-    project_id,
-    user_id: project.user_id,
+    $or: [
+      { project_id, user_id: project.user_id },
+      { pathname: "ACTIONS", user_id: project.user_id },
+    ],
   });
 
   const toolsObj: Record<string, Tool> = {};
 
   if (methods) {
     methods.forEach((method) => {
+      // ACTIONS are client-side tools - no execute function
+      // This allows the client to handle execution via onToolCall
+      if (method.pathname === "ACTIONS") {
+        toolsObj[method.name || "Unnamed Tool"] = tool({
+          description: method.description || "No description provided",
+          inputSchema: jsonSchema(method.parameters || {}),
+          // No execute function - makes this a client-side tool
+        });
+        return;
+      }
+
+      // Regular API methods are server-side tools with execute
       toolsObj[method.name || "Unnamed Tool"] = tool({
-        name: method.name || "Unnamed Tool",
         description: method.description || "No description provided",
         inputSchema: jsonSchema(method.parameters || {}),
         execute: async (input: unknown) => {
+          // Handle regular API methods
           if (!baseUrl) {
             throw new Error("Project base URL is not defined");
           }

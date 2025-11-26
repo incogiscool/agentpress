@@ -20,7 +20,11 @@ import {
 import { ChatInput } from "./ChatInput";
 import { ScrollArea } from "../ui/scroll-area";
 import { Button } from "../ui/button";
-import { DefaultChatTransport } from "ai";
+import {
+  DefaultChatTransport,
+  lastAssistantMessageIsCompleteWithToolCalls,
+} from "ai";
+import type { ActionMethod } from "../lib/types";
 
 type AgentpressChatPrompt = {
   projectId: string;
@@ -33,6 +37,7 @@ type AgentpressChatPrompt = {
       };
   apiEndpoint?: string;
   onToolCall?: (tools: string[]) => void;
+  actions?: ActionMethod[];
 };
 
 /**
@@ -42,12 +47,14 @@ type AgentpressChatPrompt = {
  *   - an object describing transport: { type: "header" | "query", key: string, value: string }. Adjust this to the format your routes expect.
  * @param apiEndpoint - Optional custom API endpoint.
  * @param onToolCall - Optional callback function that runs when streaming completes and a tool/function was called. Use this to refresh your UI state, refetch data, or perform any custom actions. Example: `onToolCall={() => router.refresh()}`
+ * @param actions - Optional list of action methods available for the agent to use.
  */
 export const AgentpressChat = ({
   projectId,
   authToken,
   apiEndpoint = "https://agentpress.netlify.app/api/chat",
   onToolCall,
+  actions,
 }: AgentpressChatPrompt) => {
   const [isOpen, setIsOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -62,7 +69,7 @@ export const AgentpressChat = ({
     authTokenRef.current = authToken;
   }, [authToken]);
 
-  const { messages, sendMessage, status, stop } = useChat({
+  const { messages, sendMessage, status, stop, addToolResult } = useChat({
     transport: new DefaultChatTransport({
       api: apiEndpoint,
       body: () => ({
@@ -77,7 +84,66 @@ export const AgentpressChat = ({
         auth_token: authTokenRef.current,
       }),
     }),
+
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+
+    async onToolCall({ toolCall }) {
+      console.log("Tool called:", toolCall);
+      // Check if it's a dynamic tool first for proper type narrowing
+      if (toolCall.dynamic) {
+        return;
+      }
+
+      const action = actions?.find(
+        (action) => action.name === toolCall.toolName
+      );
+
+      if (action) {
+        const result = await action.execute(toolCall.input);
+        console.log("Action found:", action.name);
+        console.log("Action result:", result);
+
+        addToolResult({
+          toolCallId: toolCall.toolCallId,
+          tool: toolCall.toolName,
+          output: result,
+        });
+      }
+
+      // action?.execute(toolCall.input).then((result) => {
+      //   console.log("Actionf found:", action);
+      //   console.log("Action result:", result);
+      //   console.log("INPUTS", toolCall.input);
+
+      //   addToolResult({
+      //     tool: toolCall.toolName,
+      //     toolCallId: toolCall.toolCallId,
+      //     output: JSON.stringify(result),
+      //   });
+      // });
+
+      // Simulate tool execution result
+      // In a real implementation, you would call your backend or perform the action here
+      // addToolResult({
+      //   tool: toolCall.toolName,
+      //   toolCallId: toolCall.toolCallId,
+      //   output: result,
+      // });
+
+      // if (toolCall.toolName === "getLocation") {
+      //   const cities = ["New York", "Los Angeles", "Chicago", "San Francisco"];
+
+      //   // No await - avoids potential deadlocks
+      //   addToolResult({
+      //     tool: "getLocation",
+      //     toolCallId: toolCall.toolCallId,
+      //     output: cities[Math.floor(Math.random() * cities.length)],
+      //   });
+      // }
+    },
   });
+
+  console.log("Chat messages:", messages);
 
   const handleSubmit = (
     prompt: string,
@@ -138,7 +204,7 @@ export const AgentpressChat = ({
   return (
     <>
       {isOpen ? (
-        <Card className="w-96 fixed bottom-4 right-4 flex flex-col">
+        <Card className="w-96 fixed bottom-4 right-4 flex flex-col z-50">
           {hasMessages && (
             <CardHeader className="border-b">
               <CardTitle className="flex justify-between items-center">

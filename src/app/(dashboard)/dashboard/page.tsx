@@ -2,12 +2,14 @@ import { ProjectCard } from "@/components/features/dashboard";
 import { CreateProjectModal } from "@/components/features/dashboard";
 import { Header } from "@/components/typography";
 import { getUserProjects } from "@/lib/user/projects";
+import { ChatComponentAgent } from "./chatcomponentagent";
 
 export default async function DashboardPage() {
   const projects = await getUserProjects();
 
   return (
     <div>
+      <ChatComponentAgent />
       <div className="items-center flex justify-between gap-4 flex-wrap">
         <Header
           title="Your Projects"
