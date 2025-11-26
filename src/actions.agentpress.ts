@@ -5,6 +5,8 @@ import {
   createUserProjectSchema,
   deleteUserProject,
   deleteUserProjectSchema,
+  updateUserProject,
+  updateUserProjectSchema,
 } from "./lib/user/projects/actions";
 import { deleteUserMethod, deleteUserMethodSchema } from "./lib/user/methods";
 import {
@@ -19,6 +21,13 @@ export const agentpressActions: ActionMethod[] = [
     description: "Retrieve all projects for the authenticated user",
     execute: getUserProjects,
     argumentsSchema: undefined,
+  },
+  {
+    name: "updateUserProject",
+    id: "updateUserProject",
+    description: "Update an existing project for the authenticated user",
+    execute: updateUserProject,
+    argumentsSchema: updateUserProjectSchema,
   },
   {
     name: "createUserProject",
