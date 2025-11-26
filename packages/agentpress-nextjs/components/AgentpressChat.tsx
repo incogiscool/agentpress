@@ -99,51 +99,19 @@ export const AgentpressChat = ({
       );
 
       if (action) {
-        const result = await action.execute(toolCall.input);
-        console.log("Action found:", action.name);
-        console.log("Action result:", result);
+        action.execute(toolCall.input).then((result: unknown) => {
+          console.log("Action found:", action.name);
+          console.log("Action result:", result);
 
-        addToolResult({
-          toolCallId: toolCall.toolCallId,
-          tool: toolCall.toolName,
-          output: result,
+          addToolResult({
+            toolCallId: toolCall.toolCallId,
+            tool: toolCall.toolName,
+            output: result,
+          });
         });
       }
-
-      // action?.execute(toolCall.input).then((result) => {
-      //   console.log("Actionf found:", action);
-      //   console.log("Action result:", result);
-      //   console.log("INPUTS", toolCall.input);
-
-      //   addToolResult({
-      //     tool: toolCall.toolName,
-      //     toolCallId: toolCall.toolCallId,
-      //     output: JSON.stringify(result),
-      //   });
-      // });
-
-      // Simulate tool execution result
-      // In a real implementation, you would call your backend or perform the action here
-      // addToolResult({
-      //   tool: toolCall.toolName,
-      //   toolCallId: toolCall.toolCallId,
-      //   output: result,
-      // });
-
-      // if (toolCall.toolName === "getLocation") {
-      //   const cities = ["New York", "Los Angeles", "Chicago", "San Francisco"];
-
-      //   // No await - avoids potential deadlocks
-      //   addToolResult({
-      //     tool: "getLocation",
-      //     toolCallId: toolCall.toolCallId,
-      //     output: cities[Math.floor(Math.random() * cities.length)],
-      //   });
-      // }
     },
   });
-
-  console.log("Chat messages:", messages);
 
   const handleSubmit = (
     prompt: string,

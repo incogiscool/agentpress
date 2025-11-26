@@ -187,10 +187,12 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  console.log(toolsObj);
+
   const result = streamText({
     model: openai("gpt-4o"),
     system:
-      "You are an AI assistant that helps users by utilizing available tools to provide accurate and efficient responses. Use the tools when necessary to gather information or perform actions on behalf of the user.",
+      "Use the tools when necessary to gather information or perform actions on behalf of the user. Give the user an informative response about the data after every tool call.",
     messages: convertToModelMessages(messages),
     stopWhen: stepCountIs(10),
     tools: {

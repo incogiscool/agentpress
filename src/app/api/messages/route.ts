@@ -10,22 +10,35 @@ const client = twilio(accountSid, authToken);
 export const GET = async () => {
   const { userId } = await auth();
 
-  if (userId) {
-    const messages = [
-      {
-        name: "Adam",
-        id: "1",
-      },
-      {
-        name: "Katie",
-        id: "2",
-      },
-    ];
+  const messages = [
+    {
+      name: "Adam",
+      id: "1",
+    },
+    {
+      name: "Katie",
+      id: "2",
+    },
+  ];
 
-    return NextResponse.json({ messages });
-  } else {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  return NextResponse.json({ messages });
+
+  // if (userId) {
+  //   const messages = [
+  //     {
+  //       name: "Adam",
+  //       id: "1",
+  //     },
+  //     {
+  //       name: "Katie",
+  //       id: "2",
+  //     },
+  //   ];
+
+  //   return NextResponse.json({ messages });
+  // } else {
+  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // }
 };
 
 export const POST = async (req: NextRequest) => {
