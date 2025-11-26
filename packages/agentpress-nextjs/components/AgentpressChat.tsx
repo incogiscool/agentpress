@@ -25,6 +25,7 @@ import {
   lastAssistantMessageIsCompleteWithToolCalls,
 } from "ai";
 import type { ActionMethod } from "../lib/types";
+import { MemoizedMarkdown } from "./MemoizedMarkdown";
 
 type AgentpressChatPrompt = {
   projectId: string;
@@ -88,7 +89,7 @@ export const AgentpressChat = ({
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
 
     async onToolCall({ toolCall }) {
-      console.log("Tool called:", toolCall);
+      // console.log("Tool called:", toolCall);
       // Check if it's a dynamic tool first for proper type narrowing
       if (toolCall.dynamic) {
         return;
@@ -100,9 +101,6 @@ export const AgentpressChat = ({
 
       if (action) {
         action.execute(toolCall.input).then((result: unknown) => {
-          console.log("Action found:", action.name);
-          console.log("Action result:", result);
-
           addToolResult({
             toolCallId: toolCall.toolCallId,
             tool: toolCall.toolName,
@@ -236,49 +234,53 @@ export const AgentpressChat = ({
                             : "bg-muted"
                         }`}
                       >
-                        {message.parts.map((part, i) => {
-                          switch (part.type) {
-                            case "text":
-                              return (
-                                <p
-                                  key={`${message.id}-${i}`}
-                                  className="text-sm"
-                                >
-                                  {part.text}
-                                </p>
-                              );
-                            case "step-start":
-                              return null; // Don't render step-start
-                            default:
-                              // Handle tool calls (type starts with "tool-")
-                              if (part.type.startsWith("tool-")) {
-                                const toolName = part.type.replace("tool-", "");
+                        <div className="prose space-y-2">
+                          {message.parts.map((part, i) => {
+                            switch (part.type) {
+                              case "text":
+                                return (
+                                  <MemoizedMarkdown
+                                    key={`${message.id}-text`}
+                                    id={message.id}
+                                    content={part.text}
+                                  />
+                                );
+                              case "step-start":
+                                return null; // Don't render step-start
+                              default:
+                                // Handle tool calls (type starts with "tool-")
+                                if (part.type.startsWith("tool-")) {
+                                  const toolName = part.type.replace(
+                                    "tool-",
+                                    ""
+                                  );
+                                  return (
+                                    <div
+                                      key={`${message.id}-${i}`}
+                                      className="mb-2"
+                                    >
+                                      <div className="rounded-lg px-3 py-2 bg-blue-50 border border-blue-200">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                          <p className="text-xs text-blue-800 font-medium">
+                                            {toolName}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                }
                                 return (
                                   <div
                                     key={`${message.id}-${i}`}
-                                    className="mb-2"
+                                    className="text-xs text-muted-foreground italic"
                                   >
-                                    <div className="rounded-lg px-3 py-2 bg-blue-50 border border-blue-200">
-                                      <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                        <p className="text-xs text-blue-800 font-medium">
-                                          {toolName}
-                                        </p>
-                                      </div>
-                                    </div>
+                                    {part.type}
                                   </div>
                                 );
-                              }
-                              return (
-                                <div
-                                  key={`${message.id}-${i}`}
-                                  className="text-xs text-muted-foreground italic"
-                                >
-                                  {part.type}
-                                </div>
-                              );
-                          }
-                        })}
+                            }
+                          })}
+                        </div>
                       </div>
                     </div>
                   ))}
