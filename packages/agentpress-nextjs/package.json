@@ -1,6 +1,6 @@
 {
   "name": "agentpress-nextjs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "React component library for building AI-powered chat interfaces with Next.js and AgentPress",
   "author": "incogiscool",
   "license": "MIT",
@@ -52,7 +52,7 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "^15.0.0",
+    "next": "^15.5.7",
     "zod": "^4.0.0"
   },
   "dependencies": {
@@ -70,6 +70,7 @@
     "lucide-react": "^0.548.0",
     "marked": "^17.0.1",
     "react-markdown": "^10.1.0",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "zod-to-json-schema": "^3.25.0"
   }
 }

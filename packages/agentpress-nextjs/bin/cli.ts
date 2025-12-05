@@ -6,11 +6,16 @@
  * converts Zod schemas to JSON Schema, and uploads them to the AgentPress database.
  *
  * Usage: bunx agentpress-sync
+ *        bunx agentpress-sync --legacy-zod  (for Zod v3.x users)
  */
 
 import fs from "fs";
 import path from "path";
 import { z } from "zod";
+
+// Parse CLI arguments
+const args = process.argv.slice(2);
+const useLegacyZod = args.includes("--legacy-zod");
 
 // Types
 interface Method {
@@ -33,6 +38,34 @@ interface ProcessedMethod {
 interface RouteResult {
   pathname: string;
   methods: ProcessedMethod[];
+}
+
+/**
+ * Converts a Zod schema to JSON Schema
+ * Uses native z.toJSONSchema() for Zod 4+, or zod-to-json-schema for legacy Zod 3.x
+ */
+async function zodToJsonSchema(
+  schema: z.ZodType
+): Promise<Record<string, unknown>> {
+  if (useLegacyZod) {
+    try {
+      const { zodToJsonSchema: legacyZodToJsonSchema } = await import(
+        "zod-to-json-schema"
+      );
+
+      // @ts-expect-error Types dont match
+      return legacyZodToJsonSchema(schema) as Record<string, unknown>;
+    } catch {
+      console.error(
+        "❌ Error: --legacy-zod flag requires zod-to-json-schema package.\n" +
+          "Please install it: bun add zod-to-json-schema"
+      );
+      process.exit(1);
+    }
+  }
+
+  // Zod 4+ native method
+  return z.toJSONSchema(schema) as Record<string, unknown>;
 }
 
 // Configuration - Look for API directory in the current working directory (where command is run)
@@ -130,32 +163,34 @@ async function loadAgentpressActions(): Promise<RouteResult | null> {
       return null;
     }
 
-    const methods: ProcessedMethod[] = actionsModule.agentpressActions.map(
-      (action: Record<string, unknown>) => {
-        const processed: ProcessedMethod = {
-          name: action.name as string,
-          description: action.description as string,
-          actionId: action.id as string,
-          method: "ACTION",
-          paramsType: "body",
-        };
+    const methods: ProcessedMethod[] = await Promise.all(
+      actionsModule.agentpressActions.map(
+        async (action: Record<string, unknown>) => {
+          const processed: ProcessedMethod = {
+            name: action.name as string,
+            description: action.description as string,
+            actionId: action.id as string,
+            method: "ACTION",
+            paramsType: "body",
+          };
 
-        // Convert Zod schema to JSON Schema if present
-        if (action.argumentsSchema) {
-          try {
-            processed.params = z.toJSONSchema(
-              action.argumentsSchema as z.ZodType
-            ) as Record<string, unknown>;
-          } catch (error) {
-            console.warn(
-              `⚠️  Warning: Could not convert Zod schema for ${action.name}:`,
-              error
-            );
+          // Convert Zod schema to JSON Schema if present
+          if (action.argumentsSchema) {
+            try {
+              processed.params = await zodToJsonSchema(
+                action.argumentsSchema as z.ZodType
+              );
+            } catch (error) {
+              console.warn(
+                `⚠️  Warning: Could not convert Zod schema for ${action.name}:`,
+                error
+              );
+            }
           }
-        }
 
-        return processed;
-      }
+          return processed;
+        }
+      )
     );
 
     return {
@@ -173,7 +208,11 @@ async function loadAgentpressActions(): Promise<RouteResult | null> {
  */
 async function main() {
   console.log("🔍 Scanning API routes for methods...");
-  console.log(`📁 Using API directory: ${API_DIR}\n`);
+  console.log(`📁 Using API directory: ${API_DIR}`);
+  if (useLegacyZod) {
+    console.log("📦 Using legacy Zod mode (zod-to-json-schema)");
+  }
+  console.log();
 
   // Check if Zod is available
   try {
@@ -201,8 +240,8 @@ async function main() {
       }
 
       // Process each method
-      const methods: ProcessedMethod[] = routeModule.methods.map(
-        (method: Method) => {
+      const methods: ProcessedMethod[] = await Promise.all(
+        routeModule.methods.map(async (method: Method) => {
           const processed: ProcessedMethod = {
             name: method.name,
             description: method.description,
@@ -213,10 +252,7 @@ async function main() {
           // Convert Zod schema to JSON Schema if present
           if (method.params) {
             try {
-              processed.params = z.toJSONSchema(method.params) as Record<
-                string,
-                unknown
-              >;
+              processed.params = await zodToJsonSchema(method.params);
             } catch (error) {
               console.warn(
                 `⚠️  Warning: Could not convert Zod schema for ${method.name}:`,
@@ -226,7 +262,7 @@ async function main() {
           }
 
           return processed;
-        }
+        })
       );
 
       // Get the relative path from API_DIR and convert to web path

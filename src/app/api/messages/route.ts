@@ -8,7 +8,7 @@ const authToken = process.env.TWILIO_AUTH_TOKEN!;
 const client = twilio(accountSid, authToken);
 
 export const GET = async () => {
-  const { userId } = await auth();
+  // const { userId } = await auth();
 
   const messages = [
     {

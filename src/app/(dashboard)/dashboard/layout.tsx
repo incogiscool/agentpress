@@ -2,6 +2,7 @@ import PageLayout from "@/components/layout/PageLayout";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
+import { ChatComponentAgent } from "./chatcomponentagent";
 
 export default async function DashboardLayout({
   children,
@@ -14,5 +15,10 @@ export default async function DashboardLayout({
     redirect("/signin");
   }
 
-  return <PageLayout>{children}</PageLayout>;
+  return (
+    <PageLayout>
+      <ChatComponentAgent />
+      {children}
+    </PageLayout>
+  );
 }
