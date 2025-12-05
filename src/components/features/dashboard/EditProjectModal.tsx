@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
 
 const editProjectSchema = z.object({
   name: z.string().min(1, "Project name is required"),
-  baseUrl: z.url("Invalid URL format"),
+  baseUrl: z.string().url("Invalid URL format"),
 });
 
 interface EditProjectModalProps {

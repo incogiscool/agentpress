@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 
 const createProjectSchema = z.object({
   name: z.string().min(1, "Project name is required"),
-  baseUrl: z.url("Invalid URL format"),
+  baseUrl: z.string().url("Invalid URL format"),
 });
 
 export default function CreateProjectModal() {

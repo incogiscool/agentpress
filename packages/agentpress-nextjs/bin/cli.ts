@@ -42,18 +42,21 @@ interface RouteResult {
 
 /**
  * Converts a Zod schema to JSON Schema
- * Uses native z.toJSONSchema() for Zod 4+, or zod-to-json-schema for legacy Zod 3.x
+ * Automatically detects Zod version and uses appropriate method:
+ * - Zod 4+: Uses native z.toJSONSchema()
+ * - Zod 3.x: Uses zod-to-json-schema package
+ * - Override with --legacy-zod flag to force zod-to-json-schema
  */
 async function zodToJsonSchema(
   schema: z.ZodType
 ): Promise<Record<string, unknown>> {
+  // Check if we should force legacy mode
   if (useLegacyZod) {
     try {
       const { zodToJsonSchema: legacyZodToJsonSchema } = await import(
         "zod-to-json-schema"
       );
 
-      // @ts-expect-error Types dont match
       return legacyZodToJsonSchema(schema) as Record<string, unknown>;
     } catch {
       console.error(
@@ -64,8 +67,29 @@ async function zodToJsonSchema(
     }
   }
 
-  // Zod 4+ native method
-  return z.toJSONSchema(schema) as Record<string, unknown>;
+  // Try native Zod 4+ method first
+  const zodAsAny = z as unknown as Record<string, unknown>;
+  if (typeof zodAsAny.toJSONSchema === "function") {
+    return (
+      zodAsAny.toJSONSchema as (schema: z.ZodType) => Record<string, unknown>
+    )(schema);
+  }
+
+  // Fall back to zod-to-json-schema for Zod 3.x
+  try {
+    const { zodToJsonSchema: legacyZodToJsonSchema } = await import(
+      "zod-to-json-schema"
+    );
+
+    return legacyZodToJsonSchema(schema) as Record<string, unknown>;
+  } catch {
+    console.error(
+      "❌ Error: Could not convert Zod schema.\n" +
+        "For Zod 3.x, please install zod-to-json-schema: bun add zod-to-json-schema\n" +
+        "Or use Zod 4+: bun add zod@^4.0.0"
+    );
+    process.exit(1);
+  }
 }
 
 // Configuration - Look for API directory in the current working directory (where command is run)
@@ -209,20 +233,32 @@ async function loadAgentpressActions(): Promise<RouteResult | null> {
 async function main() {
   console.log("🔍 Scanning API routes for methods...");
   console.log(`📁 Using API directory: ${API_DIR}`);
-  if (useLegacyZod) {
-    console.log("📦 Using legacy Zod mode (zod-to-json-schema)");
-  }
-  console.log();
 
-  // Check if Zod is available
+  // Check if Zod is available and detect version
+  let zodModule: typeof z;
   try {
-    await import("zod");
+    zodModule = await import("zod").then((m) => m);
   } catch {
     console.error(
-      "❌ Error: Zod is required but not found in your project.\nPlease install Zod v4+: bun add zod@^4.0.0"
+      "❌ Error: Zod is required but not found in your project.\nPlease install Zod: bun add zod@^3.0.0"
     );
     process.exit(1);
   }
+
+  // Detect Zod version
+  const isZod4Plus =
+    typeof (zodModule as unknown as Record<string, unknown>).toJSONSchema ===
+    "function";
+  if (isZod4Plus) {
+    console.log("📦 Using Zod 4+ (native toJSONSchema)");
+  } else {
+    console.log("📦 Using Zod 3.x (zod-to-json-schema)");
+  }
+
+  if (useLegacyZod) {
+    console.log("⚙️  Forced legacy Zod mode (--legacy-zod)");
+  }
+  console.log();
 
   const results: RouteResult[] = [];
 
