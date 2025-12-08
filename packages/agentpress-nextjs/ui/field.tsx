@@ -7,7 +7,10 @@ import { cn } from "../lib/utils";
 import { Label } from "./label";
 import { Separator } from "./separator";
 
-function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
+function FieldSet({
+  className,
+  ...props
+}: React.FieldsetHTMLAttributes<HTMLFieldSetElement>) {
   return (
     <fieldset
       data-slot="field-set"
@@ -21,11 +24,15 @@ function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   );
 }
 
+interface FieldLegendProps extends React.HTMLAttributes<HTMLLegendElement> {
+  variant?: "legend" | "label";
+}
+
 function FieldLegend({
   className,
   variant = "legend",
   ...props
-}: React.ComponentProps<"legend"> & { variant?: "legend" | "label" }) {
+}: FieldLegendProps) {
   return (
     <legend
       data-slot="field-legend"
@@ -41,7 +48,10 @@ function FieldLegend({
   );
 }
 
-function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
+function FieldGroup({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       data-slot="field-group"
@@ -78,11 +88,11 @@ const fieldVariants = cva(
   }
 );
 
-function Field({
-  className,
-  orientation = "vertical",
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof fieldVariants>) {
+interface FieldProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof fieldVariants> {}
+
+function Field({ className, orientation = "vertical", ...props }: FieldProps) {
   return (
     <div
       role="group"
@@ -94,7 +104,10 @@ function Field({
   );
 }
 
-function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
+function FieldContent({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       data-slot="field-content"
@@ -125,7 +138,10 @@ function FieldLabel({
   );
 }
 
-function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
+function FieldTitle({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       data-slot="field-label"
@@ -138,7 +154,10 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
+function FieldDescription({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
       data-slot="field-description"
@@ -157,9 +176,7 @@ function FieldSeparator({
   children,
   className,
   ...props
-}: React.ComponentProps<"div"> & {
-  children?: React.ReactNode;
-}) {
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       data-slot="field-separator"
@@ -183,14 +200,16 @@ function FieldSeparator({
   );
 }
 
+interface FieldErrorProps extends React.HTMLAttributes<HTMLDivElement> {
+  errors?: Array<{ message?: string } | undefined>;
+}
+
 function FieldError({
   className,
   children,
   errors,
   ...props
-}: React.ComponentProps<"div"> & {
-  errors?: Array<{ message?: string } | undefined>;
-}) {
+}: FieldErrorProps) {
   const content = useMemo(() => {
     if (children) {
       return children;
