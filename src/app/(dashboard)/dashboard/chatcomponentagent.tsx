@@ -8,7 +8,7 @@ export const ChatComponentAgent = () => {
 
   return (
     <AgentpressChat
-      projectId={"69228fd1e17ebdfb058867fb"}
+      projectId={"697a9d5b068e86e66f409f51"}
       apiEndpoint="http://localhost:3000/api/chat"
       actions={agentpressActions}
       onToolCall={router.refresh}
